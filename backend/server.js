@@ -355,6 +355,63 @@ app.delete('/api/vehiculos/:patente', async (req, res) => {
   }
 });
 
+// Registrar ubicación enviada por seguimiento.html
+app.post('/api/ubicacion', async (req, res) => {
+  const { dni, latitud, longitud, timestamp } = req.body;
+
+  // Validación rápida
+  if (!dni || !latitud || !longitud) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  try {
+    const { error } = await supabase
+      .from('ubicaciones')
+      .insert([{ dni, latitud, longitud, timestamp }]);
+
+    if (error) {
+      console.error('❌ Error al guardar ubicación:', error);
+      return res.status(500).json({ error: 'Error al guardar ubicación' });
+    }
+
+    console.log(`📍 Ubicación registrada para DNI ${dni}: (${latitud}, ${longitud})`);
+    res.status(200).json({ mensaje: 'Ubicación registrada correctamente' });
+
+  } catch (err) {
+    console.error('❌ Error inesperado al guardar ubicación:', err);
+    res.status(500).json({ error: 'Error inesperado del servidor' });
+  }
+});
+
+// Obtener todas las ubicaciones de un conductor
+app.get('/api/ubicaciones/:dni', async (req, res) => {
+  const { dni } = req.params;
+
+  if (!dni) {
+    return res.status(400).json({ error: 'DNI no proporcionado' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('ubicaciones')
+      .select('*')
+      .eq('dni', dni)
+      .order('timestamp', { ascending: true }); // Opcional: ordena por fecha
+
+    if (error) {
+      console.error('❌ Error al traer ubicaciones:', error);
+      return res.status(500).json({ error: 'Error al obtener ubicaciones' });
+    }
+
+    res.status(200).json(data);
+
+  } catch (err) {
+    console.error('❌ Error inesperado en /ubicaciones:', err);
+    res.status(500).json({ error: 'Error inesperado del servidor' });
+  }
+});
+
+
 // Ruta para verificar el estado del servidor
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'Server is running' });
