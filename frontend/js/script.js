@@ -147,6 +147,7 @@ async function cargarConductores() {
       row.innerHTML = `
         <td>${c.dni}</td>
         <td>${c.nombreCompleto}</td>
+        <td>${c.email}</td>
         <td>${c.codigoPostal}</td>
         <td>${c.domicilio}</td>
         <td>${formatearFecha(c.vencimientoLic)}</td>
@@ -225,6 +226,7 @@ function editarConductor(dni) {
       f.reset();
       f.dni.value = data.dni;
       f.nombreCompleto.value = data.nombreCompleto;
+      f.email.value = data.email;
       f.codigoPostal.value = data.codigoPostal;
       f.domicilio.value = data.domicilio;
       f.vencimientoLic.value = data.vencimientoLic?.split('T')[0] || '';
