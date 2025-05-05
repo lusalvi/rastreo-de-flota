@@ -181,7 +181,7 @@ async function guardarConductor(e) {
     }
 
     if (!validarCategoriaLic(categoriaLic)) {
-      alert('Categoría de licencia inválida. Debe contener de 1 a 3 letras.');
+      alert('Categoría de licencia inválida. Debe contener de 1 a 3 letras y números.');
       return;
     }
 

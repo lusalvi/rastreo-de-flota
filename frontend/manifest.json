@@ -1,17 +1,37 @@
 {
-    "name": "Seguimiento GeoBuild",
-    "short_name": "GeoSeguimiento",
+    "name": "GeoBuild Seguimiento de Flotas",
+    "short_name": "GeoBuild",
+    "description": "Aplicación de seguimiento para conductores de GeoBuild S.A.",
     "start_url": "/frontend/templates/seguimiento.html",
     "display": "standalone",
     "background_color": "#004643",
     "theme_color": "#004643",
-    "orientation": "portrait",
+    "orientation": "portrait-primary",
     "icons": [
       {
-        "src": "img/iconoSF.png",
+        "src": "../img/iconoSF.png",
         "type": "image/png",
-        "sizes": "192x192"
+        "sizes": "192x192",
+        "purpose": "any"
+      },
+      {
+        "src": "../img/iconoSF.png",
+        "type": "image/png",
+        "sizes": "512x512",
+        "purpose": "any"
+      },
+      {
+        "src": "../img/iconoSF.png",
+        "type": "image/png",
+        "sizes": "192x192",
+        "purpose": "maskable"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Iniciar Seguimiento",
+        "url": "/frontend/templates/seguimiento.html",
+        "description": "Iniciar seguimiento de ruta"
       }
     ]
   }
-  
