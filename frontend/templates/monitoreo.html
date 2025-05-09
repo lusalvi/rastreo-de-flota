@@ -12,6 +12,20 @@
    <link href="../css/monitoreo.css" rel="stylesheet">
    <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon"> 
    <title>Sistema de Rastreo de Flotas</title>
+
+  <script src="../js/script.js"></script>
+  <script>
+    const ruta = window.location.pathname;
+    const esLogin = ruta.includes('logueo.html');
+    const esVerificacion = ruta.includes('verificacion.html');
+    const verificado = sessionStorage.getItem("verificacion_completa") === "true";
+    const sesionIniciada = localStorage.getItem("inicio_sesion_correcto") === "true";
+    if (!esLogin && !esVerificacion && (!verificado || !sesionIniciada)) {
+      window.location.replace("logueo.html");
+    }
+  </script>
+
+
   </head>
 <body>
   <div class="container">
@@ -340,5 +354,7 @@
       document.head.appendChild(script);
     };
   </script>
+
+   <script src="../js/bootstrap.js"></script>
 </body>
 </html>
