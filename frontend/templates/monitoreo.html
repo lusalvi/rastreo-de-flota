@@ -1,49 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- CSS -->
-  <link rel="stylesheet" href="../css/bootstrap.css">
-  <link rel="stylesheet" href="../css/costume.css">
-  <!-- FONTS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
-  <!-- ICON DE LA PÁGINA -->
-  <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
-  <title>Sistema de Rastreo de Flotas</title>
-    <!-- SCRIPT -->
-    <script>
-      const ruta = window.location.pathname;
-      const esLogin = ruta.includes('logueo.html');
-      const esVerificacion = ruta.includes('verificacion.html');
-    
-      const verificado = sessionStorage.getItem("verificacion_completa") === "true";
-      const sesionIniciada = localStorage.getItem("inicio_sesion_correcto") === "true";
-    
-      if (!esLogin && !esVerificacion && (!verificado || !sesionIniciada)) {
-        window.location.replace("logueo.html");
-      }
-    </script>   
-    <!-- SCRIPT MAPA -->    
-    <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArifzqYFkv6deJgQqMAsB2Www-2NnpNVg&callback=initMap">
-    </script>
-  <script>
-    function initMap() {
-      const mendozaCapital = { lat: -32.8908, lng: -68.8272 };
-  
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 12, // Zoom adecuado para una ciudad
-        center: mendozaCapital,
-        mapTypeId: "roadmap"
-      });
-      }
-  </script>    
-</head>
-
+  <title>Centro de Monitoreo de Flotas</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Estilos personalizados -->
+   <link rel="stylesheet" href="../css/bootstrap.css">
+   <link rel="stylesheet" href="../css/costume.css">
+   <link href="../css/monitoreo.css" rel="stylesheet">
+   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon"> 
+   <title>Sistema de Rastreo de Flotas</title>
+  </head>
 <body>
   <div class="container">
     <header
@@ -70,24 +39,306 @@
       </div>
     </header>
   </div>
-  <hr>
 
-  <div class="container">
-    <h3>Centro de Monitoreo</h3>
-  </div>
-  
-  <div id="map"></div>
 
-  <!-- Footer -->
-  <footer class=" py-3 my-4 border-top">
-    <!-- DERECHOS DE AUTOR -->
-    <div>
-      <p class="creditos">&copy; 2025 Desarrollo de Software, ITU-UNCUYO</p>
+  <div class="container mb-4">
+    <h3>Centro de Monitoreo de Flotas</h3>
+    
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-value" id="conductorCount">0</div>
+        <div class="stat-label">Conductores activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="vehicleCount">0</div>
+        <div class="stat-label">Vehículos en ruta</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="currentTime">--:--</div>
+        <div class="stat-label">Hora actual</div>
+      </div>
     </div>
-  </footer>
-  <script src="../js/script.js"></script>
-  <script src="../js/bootstrap.js"></script>
-  
-</body>
+    
+    <div class="d-flex gap-2 mb-4">
+      <button id="refreshData" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Actualizar datos
+      </button>
+      <button id="centerMap" class="btn btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+          <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+          <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+        </svg>
+        Centrar mapa
+      </button>
+    </div>
+  </div>
 
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="conductor-list-container">
+        <h3>Conductores Activos</h3>
+        <input type="text" id="searchConductor" class="form-control" placeholder="Buscar conductor...">
+        <div class="conductor-list" id="conductorList">
+          <!-- Los conductores se cargarán dinámicamente aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="map-container">
+      <div id="map"></div>
+      <button id="refreshMap" class="refresh-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Script principal -->
+  <script>
+    // API Endpoint
+    const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
+    
+    // Variables globales
+    let map, directionsService, directionsRenderer;
+    let conductores = [];
+    let markers = [];
+    let conductorMarkers = {};
+    let refreshInterval;
+    
+    // Inicializar la aplicación cuando se carga el script de Google Maps
+    function initMap() {
+      // Coordenadas centrales (Mendoza)
+      const center = { lat: -32.8894587, lng: -68.8458386 };
+      
+      // Configuración del mapa
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: center,
+        mapTypeControl: true,
+        fullscreenControl: true,
+        streetViewControl: true,
+        zoomControl: true
+      });
+      
+      // Inicializar servicios de direcciones
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: false,
+        polylineOptions: {
+          strokeColor: '#0d6efd',
+          strokeWeight: 5
+        }
+      });
+      
+      // Configurar event listeners
+      document.getElementById('refreshData').addEventListener('click', actualizarDatos);
+      document.getElementById('centerMap').addEventListener('click', centrarMapa);
+      document.getElementById('refreshMap').addEventListener('click', actualizarDatos);
+      document.getElementById('searchConductor').addEventListener('input', filtrarConductores);
+      
+      // Actualizar la hora cada segundo
+      actualizarHora();
+      setInterval(actualizarHora, 1000);
+      
+      // Cargar datos iniciales
+      cargarDatos();
+      
+      // Configurar actualización automática cada 30 segundos
+      refreshInterval = setInterval(actualizarDatos, 30000);
+    }
+    
+    // Actualizar la hora actual
+    function actualizarHora() {
+      const ahora = new Date();
+      document.getElementById('currentTime').textContent = ahora.toLocaleTimeString();
+    }
+    
+    // Cargar datos de conductores y vehículos
+    async function cargarDatos() {
+      try {
+        // Mostrar spinner o mensaje de carga
+        document.getElementById('conductorCount').innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+        
+        // Obtener conductores desde la API
+        const response = await fetch(`${API_URL}/conductores`);
+        if (!response.ok) {
+          throw new Error('Error al obtener datos de conductores');
+        }
+        
+        const data = await response.json();
+        conductores = data.filter(c => c.activo === true || c.compartiendo === true);
+        
+        // Actualizar contador de conductores
+        document.getElementById('conductorCount').textContent = conductores.length;
+        document.getElementById('vehicleCount').textContent = conductores.filter(c => c.vehiculo).length;
+        
+        // Mostrar conductores en la lista
+        mostrarConductores(conductores);
+        
+        // Mostrar conductores en el mapa
+        mostrarConductoresEnMapa(conductores);
+        
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+        alert('Error al cargar datos: ' + error.message);
+      }
+    }
+    
+    // Mostrar conductores en la lista lateral
+    function mostrarConductores(conductores) {
+      const listaContainer = document.getElementById('conductorList');
+      listaContainer.innerHTML = '';
+      
+      if (conductores.length === 0) {
+        listaContainer.innerHTML = '<div class="p-3 text-center text-muted">No hay conductores activos</div>';
+        return;
+      }
+      
+      conductores.forEach(conductor => {
+        const patente = typeof conductor.vehiculo === 'object' 
+          ? conductor.vehiculo?.patente 
+          : conductor.vehiculo;
+        
+        const card = document.createElement('div');
+        card.className = 'conductor-card';
+        card.dataset.dni = conductor.dni;
+        card.innerHTML = `
+          <div class="conductor-status" style="background-color: ${conductor.compartiendo ? '#28a745' : '#ffc107'}"></div>
+          <div class="conductor-info">
+            <div class="conductor-name">${conductor.nombreCompleto}</div>
+            <div class="conductor-details">
+              <div>DNI: ${conductor.dni}</div>
+              <div>Vehículo: ${patente || 'No asignado'}</div>
+            </div>
+          </div>
+        `;
+        
+        // Evento click para centrar en el conductor
+        card.addEventListener('click', () => {
+          const marker = conductorMarkers[conductor.dni];
+          if (marker) {
+            map.setCenter(marker.getPosition());
+            map.setZoom(16);
+            google.maps.event.trigger(marker, 'click');
+          }
+        });
+        
+        listaContainer.appendChild(card);
+      });
+    }
+    
+    // Filtrar conductores por búsqueda
+    function filtrarConductores() {
+      const busqueda = document.getElementById('searchConductor').value.toLowerCase();
+      
+      const conductoresFiltrados = conductores.filter(c => 
+        c.nombreCompleto.toLowerCase().includes(busqueda) || 
+        c.dni.toLowerCase().includes(busqueda)
+      );
+      
+      mostrarConductores(conductoresFiltrados);
+    }
+    
+    // Mostrar conductores en el mapa
+    function mostrarConductoresEnMapa(conductores) {
+      // Limpiar marcadores anteriores
+      limpiarMarcadores();
+      
+      conductores.forEach(conductor => {
+        // Solo mostrar conductores que comparten ubicación y tienen coordenadas
+        if (conductor.compartiendo && conductor.latitud && conductor.longitud) {
+          const lat = parseFloat(conductor.latitud);
+          const lng = parseFloat(conductor.longitud);
+          
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const patente = typeof conductor.vehiculo === 'object' 
+              ? conductor.vehiculo?.patente 
+              : conductor.vehiculo;
+              
+            const marker = new google.maps.Marker({
+              position: { lat, lng },
+              map: map,
+              title: conductor.nombreCompleto,
+              icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                scaledSize: new google.maps.Size(40, 40)
+              },
+              animation: google.maps.Animation.DROP
+            });
+            
+            // Crear ventana de información
+            const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <div class="info-window">
+                  <h5>${conductor.nombreCompleto}</h5>
+                  <p><strong>DNI:</strong> ${conductor.dni}</p>
+                  <p><strong>Vehículo:</strong> ${patente || 'No asignado'}</p>
+                  <p><strong>Última actualización:</strong> ${new Date(conductor.ultimaActualizacion || Date.now()).toLocaleString()}</p>
+                </div>
+              `
+            });
+            
+            // Evento click para mostrar info
+            marker.addListener('click', () => {
+              // Cerrar todas las ventanas de info abiertas
+              markers.forEach(m => m.infoWindow.close());
+              infoWindow.open(map, marker);
+            });
+            
+            // Guardar referencia al marcador
+            marker.infoWindow = infoWindow;
+            markers.push(marker);
+            conductorMarkers[conductor.dni] = marker;
+          }
+        }
+      });
+      
+      // Si no hay marcadores, mostrar mensaje
+      if (markers.length === 0) {
+        console.log('No hay conductores compartiendo ubicación');
+      }
+    }
+    
+    // Limpiar marcadores del mapa
+    function limpiarMarcadores() {
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
+      conductorMarkers = {};
+    }
+    
+    // Actualizar datos
+    function actualizarDatos() {
+      cargarDatos();
+    }
+    
+    // Centrar mapa en Mendoza
+    function centrarMapa() {
+      map.setCenter({ lat: -32.8894587, lng: -68.8458386 });
+      map.setZoom(13);
+    }
+    
+    // Limpiar intervalo de actualización al cerrar la página
+    window.addEventListener('beforeunload', () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    });
+    
+    // Esperar a que cargue la página y cargar el script de Google Maps
+    window.onload = function() {
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyArifzqYFkv6deJgQqMAsB2Www-2NnpNVg&callback=initMap';
+      script.defer = true;
+      script.async = true;
+      document.head.appendChild(script);
+    };
+  </script>
+</body>
 </html>
