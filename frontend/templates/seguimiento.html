@@ -88,8 +88,10 @@
         let markerConductor;
         let watchId;
         let deferredPrompt;
+        let updateInterval;
+        let currentPositionCoords = null;
 
-        // Comprobar si el navegador soporta service workers
+        // Registrar el service worker para PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('../service-worker.js')
@@ -102,7 +104,7 @@
             });
         }
 
-        // Escuchar el evento para instalar la aplicación
+        // Evento para instalar la aplicación como PWA
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -139,15 +141,17 @@
                 zoom: 13,
                 mapTypeControl: false,
                 fullscreenControl: true,
-                streetViewControl: false
+                streetViewControl: false,
+                gestureHandling: 'greedy' // Permite zoom con un solo dedo en móviles
             });
 
             directionsRenderer = new google.maps.DirectionsRenderer({
                 map: map,
-                suppressMarkers: false,
+                suppressMarkers: true, // Suprimimos marcadores default para usar los nuestros
                 polylineOptions: {
                     strokeColor: '#0d6efd',
-                    strokeWeight: 5
+                    strokeWeight: 5,
+                    strokeOpacity: 0.7
                 }
             });
         }
@@ -155,18 +159,34 @@
         // Obtener datos del conductor desde la API
         async function obtenerConductor(dni) {
             try {
+                document.getElementById('estado').textContent = 'Obteniendo información del conductor...';
+
                 const res = await fetch(`${API_URL}/conductores/${dni}`);
                 if (!res.ok) {
                     throw new Error('Conductor no encontrado');
                 }
                 const conductor = await res.json();
 
+                // Marcar al conductor como activo y compartiendo ubicación
+                await fetch(`${API_URL}/conductores/${dni}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...conductor,
+                        activo: true,
+                        compartiendo: true
+                    })
+                });
+
                 // Actualizar la interfaz con los datos del conductor
                 const infoConductor = document.getElementById('infoConductor');
                 infoConductor.innerHTML = `
-          <h5>Conductor: ${conductor.nombreCompleto}</h5>
-          <p><strong>DNI:</strong> ${conductor.dni}</p>
-          <p><strong>Vehículo asignado:</strong> ${conductor.vehiculo || 'No asignado'}</p>
+            <h5>Conductor: ${conductor.nombreCompleto}</h5>
+            <p><strong>DNI:</strong> ${conductor.dni}</p>
+            <p><strong>Vehículo asignado:</strong> ${typeof conductor.vehiculo === 'object'
+                        ? conductor.vehiculo?.patente
+                        : conductor.vehiculo || 'No asignado'
+                    }</p>
         `;
 
                 return conductor;
@@ -180,49 +200,81 @@
         // Obtener los pasajeros asignados al vehículo
         async function obtenerPasajeros(patente) {
             try {
+                document.getElementById('estado').textContent = 'Buscando pasajeros asignados...';
+
                 const res = await fetch(`${API_URL}/pasajeros`);
-                console.log("Respuesta fetch pasajeros:", res);
                 if (!res.ok) {
                     throw new Error('Error al obtener pasajeros');
                 }
 
                 const pasajeros = await res.json();
 
+                // Filtrar pasajeros por la patente del vehículo
                 const pasajerosFiltrados = pasajeros.filter(p => {
                     const patenteAsig = typeof p.vehiculoasignado === 'object'
-                        ? p.vehiculoasignado?.patente
-                        : p.vehiculoasignado;
-                    return patenteAsig?.trim() === patente;
+                        ? p.vehiculoasignado?.patente?.trim()
+                        : p.vehiculoasignado?.trim();
+                    return patenteAsig === patente;
                 });
 
+                // Obtener coordenadas para cada pasajero mediante geocodificación
+                const pasajerosConCoordenadas = await Promise.all(
+                    pasajerosFiltrados.map(async (pasajero) => {
+                        try {
+                            if (!pasajero.latitud || !pasajero.longitud) {
+                                // Si no tiene coordenadas, intentar geocodificar
+                                const geocoder = new google.maps.Geocoder();
+                                const direccionCompleta = `${pasajero.domicilio}, ${pasajero.codigoPostal}, Mendoza, Argentina`;
 
-                console.log("Patente limpia del conductor:", patente);
-                console.log("Pasajeros filtrados:", pasajerosFiltrados);
+                                return new Promise((resolve) => {
+                                    geocoder.geocode({ address: direccionCompleta }, (results, status) => {
+                                        if (status === "OK" && results[0]) {
+                                            const coords = results[0].geometry.location;
+                                            pasajero.latitud = coords.lat();
+                                            pasajero.longitud = coords.lng();
+                                            resolve(pasajero);
+                                        } else {
+                                            // Si falla la geocodificación, mantenemos el pasajero sin coordenadas
+                                            console.warn(`No se pudo geocodificar: ${direccionCompleta}`);
+                                            resolve(pasajero);
+                                        }
+                                    });
+                                });
+                            }
+                            return pasajero;
+                        } catch (error) {
+                            console.error("Error geocodificando pasajero:", error);
+                            return pasajero;
+                        }
+                    })
+                );
 
                 const rutaInfo = document.getElementById('rutaInfo');
                 if (pasajerosFiltrados.length > 0) {
-                    let pasajerosHTML = '<h6>Pasajeros a recoger:</h6><ul>';
-                    pasajerosFiltrados.forEach(p => {
-                        pasajerosHTML += `<li>${p.nombreCompleto} - ${p.domicilio}</li>`;
+                    let pasajerosHTML = '<h6>Pasajeros a recoger:</h6><ul class="list-group">';
+                    pasajerosConCoordenadas.forEach(p => {
+                        pasajerosHTML += `<li class="list-group-item">${p.nombreCompleto} - ${p.domicilio}</li>`;
                     });
                     pasajerosHTML += '</ul>';
                     rutaInfo.innerHTML = pasajerosHTML;
                 } else {
-                    rutaInfo.innerHTML = '<p>No hay pasajeros asignados a este vehículo.</p>';
+                    rutaInfo.innerHTML = '<div class="alert alert-warning">No hay pasajeros asignados a este vehículo.</div>';
                 }
 
-                return pasajerosFiltrados;
+                return pasajerosConCoordenadas;
             } catch (error) {
                 console.error("Error al obtener pasajeros:", error);
-                document.getElementById('estado').classList.replace('alert-info', 'alert-warning');
-                document.getElementById('estado').textContent = 'Error al obtener pasajeros: ' + error.message;
+                document.getElementById('rutaInfo').innerHTML = '<div class="alert alert-danger">Error al obtener pasajeros: ' + error.message + '</div>';
                 return [];
             }
         }
 
-        
         // Trazar la ruta en el mapa
         function trazarRuta(origen, paradas, destino) {
+            // Primero, limpiamos cualquier ruta anterior
+            directionsRenderer.setMap(null);
+            directionsRenderer.setMap(map);
+
             // Convertir las paradas a waypoints para la API de Google Maps
             const waypoints = paradas
                 .filter(p => p.latitud && p.longitud && !isNaN(p.latitud) && !isNaN(p.longitud))
@@ -231,16 +283,53 @@
                     stopover: true
                 }));
 
-                console.log("Paradas recibidas para la ruta:", paradas);
-
             // Crear la solicitud de ruta
             const request = {
                 origin: origen,
                 destination: destino,
                 waypoints: waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
-                optimizeWaypoints: true
+                optimizeWaypoints: true // Optimizar el orden de las paradas
             };
+
+            // Marcador de origen (conductor)
+            new google.maps.Marker({
+                position: origen,
+                map: map,
+                icon: {
+                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                    scaledSize: new google.maps.Size(40, 40)
+                },
+                title: 'Tu ubicación'
+            });
+
+            // Marcador de destino
+            new google.maps.Marker({
+                position: destino,
+                map: map,
+                icon: {
+                    url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                    scaledSize: new google.maps.Size(40, 40)
+                },
+                title: 'Destino: GeoBuild S.A.'
+            });
+
+            // Marcadores para cada parada (pasajeros)
+            waypoints.forEach((waypoint, index) => {
+                new google.maps.Marker({
+                    position: waypoint.location,
+                    map: map,
+                    icon: {
+                        url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                        scaledSize: new google.maps.Size(30, 30)
+                    },
+                    label: {
+                        text: (index + 1).toString(),
+                        color: 'white'
+                    },
+                    title: `Parada ${index + 1}: ${paradas[index].nombreCompleto}`
+                });
+            });
 
             // Obtener la ruta con el servicio de direcciones
             directionsService.route(request, (result, status) => {
@@ -265,12 +354,15 @@
 
                     const rutaInfo = document.getElementById('rutaInfo');
                     rutaInfo.innerHTML += `
-            <div class="mt-3">
-              <h6>Detalles de la ruta:</h6>
-              <p><strong>Distancia total:</strong> ${distanciaKm} km</p>
-              <p><strong>Tiempo estimado:</strong> ${tiempoHoras > 0 ? tiempoHoras + ' h ' : ''}${tiempoMinutos} min</p>
-            </div>
-          `;
+                <div class="mt-3 card">
+                    <div class="card-body">
+                        <h6 class="card-title">Detalles de la ruta:</h6>
+                        <p class="card-text"><strong>Distancia total:</strong> ${distanciaKm} km</p>
+                        <p class="card-text"><strong>Tiempo estimado:</strong> ${tiempoHoras > 0 ? tiempoHoras + ' h ' : ''}${tiempoMinutos} min</p>
+                        <p class="card-text small text-muted">Ruta optimizada para minimizar tiempo de viaje</p>
+                    </div>
+                </div>
+            `;
 
                     document.getElementById('estado').classList.replace('alert-info', 'alert-success');
                     document.getElementById('estado').textContent = 'Ruta trazada correctamente. Siguiendo tu ubicación.';
@@ -287,6 +379,8 @@
             const lat = posicion.coords.latitude;
             const lng = posicion.coords.longitude;
 
+            currentPositionCoords = { lat, lng };
+
             // Si ya existe un marcador, actualizar su posición
             if (markerConductor) {
                 markerConductor.setPosition({ lat, lng });
@@ -299,30 +393,72 @@
                         url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
                         scaledSize: new google.maps.Size(40, 40)
                     },
-                    title: 'Tu ubicación'
+                    title: 'Tu ubicación actual',
+                    zIndex: 999, // Para que aparezca por encima de otros marcadores
+                    animation: google.maps.Animation.DROP
                 });
             }
 
-            // Centrar el mapa en la posición actual
-            map.setCenter({ lat, lng });
+            // Centrar el mapa en la posición actual si es la primera vez
+            if (!map.get('initializedWithPosition')) {
+                map.setCenter({ lat, lng });
+                map.set('initializedWithPosition', true);
+            }
 
             // Enviar la ubicación al backend
             enviarUbicacion(lat, lng);
         }
 
         // Enviar la ubicación al backend
-        function enviarUbicacion(latitud, longitud) {
-            fetch(`${API_URL}/ubicacion`, {
-                method: 'POST',
+        async function enviarUbicacion(latitud, longitud) {
+            try {
+                const timestamp = new Date().toISOString();
+                await fetch(`${API_URL}/ubicacion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dni: dni,
+                        latitud: latitud,
+                        longitud: longitud,
+                        timestamp: timestamp
+                    })
+                });
+
+                // También actualizar el documento del conductor con la última ubicación
+                await fetch(`${API_URL}/conductores/${dni}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        latitud: latitud,
+                        longitud: longitud,
+                        ultimaActualizacion: timestamp
+                    })
+                });
+            } catch (err) {
+                console.error('Error enviando ubicación:', err);
+            }
+        }
+
+        // Detener seguimiento de ubicación
+        function detenerSeguimiento() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+
+            // Marcar conductor como no compartiendo ubicación
+            fetch(`${API_URL}/conductores/${dni}`, {
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    dni: dni,
-                    latitud: latitud,
-                    longitud: longitud,
-                    timestamp: new Date().toISOString()
+                    compartiendo: false
                 })
-            })
-                .catch(err => console.error('Error enviando ubicación:', err));
+            }).catch(err => console.error('Error al detener seguimiento:', err));
         }
 
         // Función principal
@@ -330,6 +466,8 @@
             try {
                 // Cargar el mapa
                 initMap();
+
+                document.getElementById('estado').textContent = 'Cargando datos...';
 
                 // Obtener datos del conductor
                 const conductor = await obtenerConductor(dni);
@@ -342,25 +480,27 @@
                 }
 
                 // Obtener la patente del vehículo
-                const patente = typeof conductor.vehiculo === 'object' ? conductor.vehiculo?.patente?.trim() : conductor.vehiculo?.trim();
-
+                const patente = typeof conductor.vehiculo === 'object' ?
+                    conductor.vehiculo?.patente?.trim() :
+                    conductor.vehiculo?.trim();
 
                 // Obtener pasajeros asignados al vehículo
                 const pasajeros = await obtenerPasajeros(patente);
 
                 // Solicitar acceso a la ubicación
-                document.getElementById('estado').textContent = 'Solicitando acceso a ubicación...';
+                document.getElementById('estado').textContent = 'Solicitando acceso a tu ubicación...';
 
                 navigator.geolocation.getCurrentPosition(
-                    (posicion) => {
+                    async (posicion) => {
                         const origen = {
                             lat: posicion.coords.latitude,
                             lng: posicion.coords.longitude
                         };
 
+                        currentPositionCoords = origen;
+
                         // Destino (ubicación de la empresa)
-                        // Aquí deberías usar las coordenadas reales de la empresa
-                        const destino = { lat: -32.962028, lng: -68.718583 }; // Ejemplo: EL ITU
+                        const destino = { lat: -32.962028, lng: -68.718583 }; // El ITU como destino
 
                         // Crear marcador para el conductor
                         markerConductor = new google.maps.Marker({
@@ -370,32 +510,45 @@
                                 url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
                                 scaledSize: new google.maps.Size(40, 40)
                             },
-                            title: 'Tu ubicación'
+                            title: 'Tu ubicación',
+                            zIndex: 999
                         });
 
-                        // Si hay pasajeros, trazar la ruta
-                        if (pasajeros.length > 0) {
-                            trazarRuta(origen, pasajeros, destino);
-                        } else {
-                            // Si no hay pasajeros, trazar ruta directa a la empresa
-                            trazarRuta(origen, [], destino);
-                        }
+                        // Si hay pasajeros, trazar la ruta con paradas
+                        // Si no, trazar ruta directa a la empresa
+                        trazarRuta(origen, pasajeros, destino);
 
-                        // Iniciar seguimiento de ubicación
+                        // Iniciar seguimiento de ubicación en tiempo real
                         watchId = navigator.geolocation.watchPosition(
                             actualizarUbicacion,
                             (error) => {
-                                document.getElementById('estado').classList.replace('alert-info', 'alert-danger');
+                                document.getElementById('estado').classList.replace('alert-success', 'alert-warning');
                                 document.getElementById('estado').textContent = 'Error al seguir la ubicación: ' + error.message;
                                 console.error('Error al seguir ubicación:', error);
                             },
-                            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 10000,
+                                maximumAge: 0
+                            }
                         );
+
+                        // Actualizar la ubicación periódicamente (cada 15 segundos) incluso si no cambia
+                        updateInterval = setInterval(() => {
+                            if (currentPositionCoords) {
+                                enviarUbicacion(currentPositionCoords.lat, currentPositionCoords.lng);
+                            }
+                        }, 15000);
                     },
                     (error) => {
                         document.getElementById('estado').classList.replace('alert-info', 'alert-danger');
                         document.getElementById('estado').textContent = 'Error al obtener ubicación: ' + error.message;
                         console.error('Error al obtener ubicación:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
                     }
                 );
             } catch (error) {
@@ -406,9 +559,7 @@
         }
 
         // Limpiar el seguimiento cuando se cierra la página
-        window.addEventListener('beforeunload', () => {
-            if (watchId) navigator.geolocation.clearWatch(watchId);
-        });
+        window.addEventListener('beforeunload', detenerSeguimiento);
 
         // Cargar el script de Google Maps
         function loadScript() {
@@ -419,7 +570,7 @@
             document.head.appendChild(script);
         }
 
-        // Iniciar la carga de scripts
+        // Iniciar la carga de scripts cuando la página esté lista
         window.onload = loadScript;
     </script>
 </body>
