@@ -19,6 +19,10 @@ const CACHE_NAME = `geobuild-fleet-${CACHE_VERSION}`;
 const CACHED_RESOURCES = [
   '/',
   '/index.html',
+  '/templates/logueo.html',
+  '/templates/monitoreo.html',
+  '/templates/personal.html',
+  '/templates/vehiculos.html',
   '/templates/seguimiento.html',
   '/css/bootstrap.css',
   '/css/costume.css',
