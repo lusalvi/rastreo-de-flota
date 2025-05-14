@@ -545,7 +545,7 @@ function setupVerificacionModal() {
         document.querySelector('.modal-backdrop')?.remove();
       }
       
-      window.location.href = "/frontend/index.html";
+      window.location.href = "/index.html";
     } else {
       alert("Código incorrecto");
     }
