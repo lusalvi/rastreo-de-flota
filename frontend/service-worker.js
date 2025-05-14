@@ -3,7 +3,7 @@ const CACHE_VERSION = 'v1';
 const CACHE_NAME = `geobuild-fleet-${CACHE_VERSION}`;
 
 // Recursos que queremos cachear
-const CACHED_RESOURCES = [
+/* const CACHED_RESOURCES = [
   '/',
   '/frontend/index.html',
   '/frontend/templates/seguimiento.html',
@@ -13,7 +13,21 @@ const CACHED_RESOURCES = [
   '/frontend/js/bootstrap.js',
   '/frontend/img/iconoSF.png',
   '/frontend/manifest.json'
+]; */
+
+// Recursos que queremos cachear
+const CACHED_RESOURCES = [
+  '/',
+  '/index.html',
+  '/templates/seguimiento.html',
+  '/css/bootstrap.css',
+  '/css/costume.css',
+  '/css/cruds.css',
+  '/js/bootstrap.js',
+  '/img/iconoSF.png',
+  '/manifest.json'
 ];
+
 
 // Instalar el Service Worker
 self.addEventListener('install', event => {
