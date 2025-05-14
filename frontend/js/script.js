@@ -12,7 +12,7 @@ function verificarAcceso() {
   if (!token || !verificado) {
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace('/frontend/templates/logueo.html');
+    window.location.replace('templates/logueo.html');
   }
 }
 
@@ -46,7 +46,7 @@ function iniciarVerificacion(correo) {
 function cerrarSesion() {
   sessionStorage.clear();
   localStorage.clear();
-  window.location.href = '/frontend/templates/logueo.html';
+  window.location.href = '/templates/logueo.html';
 }
 
 // -------------------- FETCH GENERAL --------------------
