@@ -186,12 +186,19 @@
 
         const data = await response.json();
         // conductores = data.filter(c => c.activo === true || c.compartiendo === true);
-        conductores = data.filter(c =>
-          c.activo === true ||
-          c.activo === "true" ||
-          c.compartiendo === true ||
-          c.compartiendo === "true"
-        );
+
+        conductores = data.filter(c => {
+          const compartiendo = c.compartiendo === true || c.compartiendo === "true" || c.compartiendo === 1;
+          const activo = c.activo === true || c.activo === "true" || c.activo === 1;
+          return compartiendo || activo;
+        });
+
+        console.log("Conductores filtrados:", conductores.map(c => ({
+          dni: c.dni,
+          compartiendo: c.compartiendo,
+          lat: c.latitud,
+          lng: c.longitud
+        })));
 
         // Actualizar contador de conductores
         document.getElementById('conductorCount').textContent = conductores.length;
