@@ -1,6 +1,18 @@
 // script.js corregido
 const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
 
+// Determinar la base URL dependiendo de dónde se carga el script
+function getBasePath() {
+  const path = window.location.pathname;
+  // Si estamos en una ruta que contiene '/frontend', ajustamos la base
+  if (path.includes('/frontend/')) {
+    return '/frontend';
+  }
+  return '';
+}
+
+const BASE_PATH = getBasePath();
+
 // -------------------- AUTENTICACIÓN Y ACCESO --------------------
 function verificarAcceso() {
   const ruta = window.location.pathname;
@@ -12,7 +24,7 @@ function verificarAcceso() {
   if (!token || !verificado) {
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace('templates/logueo.html');
+     window.location.replace(`${BASE_PATH}/templates/logueo.html`);
   }
 }
 
@@ -46,7 +58,7 @@ function iniciarVerificacion(correo) {
 function cerrarSesion() {
   sessionStorage.clear();
   localStorage.clear();
-  window.location.href = '/templates/logueo.html';
+  window.location.href = `${BASE_PATH}/templates/logueo.html`;
 }
 
 // -------------------- FETCH GENERAL --------------------
@@ -545,7 +557,7 @@ function setupVerificacionModal() {
         document.querySelector('.modal-backdrop')?.remove();
       }
       
-      window.location.href = "/index.html";
+      window.location.href = `${BASE_PATH}/index.html`;
     } else {
       alert("Código incorrecto");
     }
@@ -648,12 +660,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Cargar datos si estamos en las páginas correspondientes
   const path = window.location.pathname;
-  if (path.includes('personal.html') || path.includes('templates/personal.html')) {
+  if (path.includes('personal.html') || path.includes('/templates/personal.html')) {
     console.log("Estamos en la página de personal, cargando datos...");
     cargarConductores();
     cargarPasajeros();
     cargarPatentesVehiculos();
-  } else if (path.includes('vehiculos.html') || path.includes('templates/vehiculos.html')) {
+  } else if (path.includes('vehiculos.html') || path.includes('/templates/vehiculos.html')) {
     console.log("Estamos en la página de vehículos, cargando datos...");
     cargarVehiculos();
   }
