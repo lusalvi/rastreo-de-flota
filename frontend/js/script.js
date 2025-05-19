@@ -607,6 +607,10 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("Ruta actual:", window.location.pathname);
   
   verificarAcceso();
+  cargarConductores();
+  cargarPasajeros();
+  cargarPatentesVehiculos();
+  cargarVehiculos();
   
   // Inicializar formularios y eventos
   const formularioLogin = document.getElementById('Formulario');
@@ -644,12 +648,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Cargar datos si estamos en las páginas correspondientes
   const path = window.location.pathname;
-  if (path.includes('personal.html')) {
+  if (path.includes('personal.html') || path.includes('templates/personal.html')) {
     console.log("Estamos en la página de personal, cargando datos...");
     cargarConductores();
     cargarPasajeros();
     cargarPatentesVehiculos();
-  } else if (path.includes('vehiculos.html')) {
+  } else if (path.includes('vehiculos.html') || path.includes('templates/vehiculos.html')) {
     console.log("Estamos en la página de vehículos, cargando datos...");
     cargarVehiculos();
   }
