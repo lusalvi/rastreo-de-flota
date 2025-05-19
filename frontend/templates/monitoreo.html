@@ -193,9 +193,10 @@
           return compartiendo || activo;
         });
 
-        console.log("Conductores filtrados:", conductores.map(c => ({
+        console.log("Todos los conductores recibidos:", data.map(c => ({
           dni: c.dni,
           compartiendo: c.compartiendo,
+          activo: c.activo,
           lat: c.latitud,
           lng: c.longitud
         })));
