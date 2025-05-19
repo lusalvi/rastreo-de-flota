@@ -185,7 +185,13 @@
         }
 
         const data = await response.json();
-        conductores = data.filter(c => c.activo === true || c.compartiendo === true);
+        // conductores = data.filter(c => c.activo === true || c.compartiendo === true);
+        conductores = data.filter(c =>
+          c.activo === true ||
+          c.activo === "true" ||
+          c.compartiendo === true ||
+          c.compartiendo === "true"
+        );
 
         // Actualizar contador de conductores
         document.getElementById('conductorCount').textContent = conductores.length;
