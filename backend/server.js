@@ -15,7 +15,6 @@ app.use(express.json()); // Para parsear JSON en las peticiones
 app.use(express.urlencoded({ extended: true })); // Para parsear datos de formularios
 
 // Configuración de CORS
-// Configuración de CORS
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
   : ['*']; // Evitás errores por espacios accidentales
