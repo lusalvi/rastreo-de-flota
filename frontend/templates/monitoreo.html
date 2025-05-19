@@ -277,9 +277,13 @@
 
       conductores.forEach(conductor => {
         // Solo mostrar conductores que comparten ubicación y tienen coordenadas
-        if (conductor.compartiendo && conductor.latitud && conductor.longitud) {
+        // if (conductor.compartiendo && conductor.latitud && conductor.longitud) {
+        if ((conductor.compartiendo === true || conductor.compartiendo === "true") && lat && lng){
+
           const lat = parseFloat(conductor.latitud);
           const lng = parseFloat(conductor.longitud);
+
+          console.log("Mostrando en mapa:", conductor.nombreCompleto, lat, lng, conductor.compartiendo);
 
           if (!isNaN(lat) && !isNaN(lng)) {
             const patente = typeof conductor.vehiculo === 'object'
