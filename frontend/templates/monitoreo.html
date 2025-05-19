@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centro de Monitoreo de Flotas</title>
-  <!-- Estilos personalizados -->
+  <!-- CSS -->
   <link rel="stylesheet" href="../css/bootstrap.css">
   <link rel="stylesheet" href="../css/costume.css">
   <link href="../css/monitoreo.css" rel="stylesheet">
+  <!-- ICON -->
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
-  <title>Sistema de Rastreo de Flotas</title>
-
+  <title>Sistema de Rastreo de Flotas | CENTRO DE MONITOREO</title>
+  <!-- SCRIPT -->
   <script src="../js/script.js"></script>
   <script>
     const ruta = window.location.pathname;
@@ -120,8 +120,6 @@
 
   <!-- Script principal -->
   <script>
-    // API Endpoint
-    const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
 
     // Variables globales
     let map, directionsService, directionsRenderer;
@@ -134,6 +132,7 @@
 
     // Inicializar la aplicación cuando se carga el script de Google Maps
     function initMap() {
+      console.log("Mapa de monitoreo inicializado correctamente.");
       // Coordenadas centrales (Mendoza)
       const center = { lat: -32.8894587, lng: -68.8458386 };
 

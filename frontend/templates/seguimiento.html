@@ -564,11 +564,12 @@
         // Cargar el script de Google Maps
         function loadScript() {
             const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyArifzqYFkv6deJgQqMAsB2Www-2NnpNVg&callback=main&loading=async';
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyArifzqYFkv6deJgQqMAsB2Www-2NnpNVg&callback=main';
             script.defer = true;
             script.async = true;
             document.head.appendChild(script);
         }
+
 
         // Iniciar la carga de scripts cuando la página esté lista
         window.onload = loadScript;
