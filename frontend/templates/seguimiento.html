@@ -35,7 +35,7 @@
             margin-bottom: 15px;
         }
 
-        .card{
+        .card {
             color: white;
         }
 
@@ -463,9 +463,43 @@
         }
 
         // Enviar la ubicación al backend
+        /*         async function enviarUbicacion(latitud, longitud) {
+                    try {
+                        const timestamp = new Date().toISOString();
+                        await fetch(`${API_URL}/ubicacion`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                dni: dni,
+                                latitud: latitud,
+                                longitud: longitud,
+                                timestamp: timestamp
+                            })
+                        });
+        
+                        // También actualizar el documento del conductor con la última ubicación
+                        await fetch(`${API_URL}/conductores/${dni}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                latitud: latitud,
+                                longitud: longitud,
+                                ultimaActualizacion: timestamp
+                            })
+                        });
+                    } catch (err) {
+                        console.error('Error enviando ubicación:', err);
+                    }
+                } */
+
+        //PROBAR
+
+
         async function enviarUbicacion(latitud, longitud) {
             try {
                 const timestamp = new Date().toISOString();
+
+                // Enviar ubicación como nuevo registro
                 await fetch(`${API_URL}/ubicacion`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -477,14 +511,16 @@
                     })
                 });
 
-                // También actualizar el documento del conductor con la última ubicación
+                // ACTUALIZAR datos del conductor en la base
                 await fetch(`${API_URL}/conductores/${dni}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         latitud: latitud,
                         longitud: longitud,
-                        ultimaActualizacion: timestamp
+                        ultimaActualizacion: timestamp,
+                        activo: true,
+                        compartiendo: true
                     })
                 });
             } catch (err) {
@@ -492,44 +528,8 @@
             }
         }
 
-        //PROBAR
-        /*
-
-        async function enviarUbicacion(latitud, longitud) {
-  try {
-    const timestamp = new Date().toISOString();
-
-    // Enviar ubicación como nuevo registro
-    await fetch(`${API_URL}/ubicacion`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        dni: dni,
-        latitud: latitud,
-        longitud: longitud,
-        timestamp: timestamp
-      })
-    });
-
-    // ACTUALIZAR datos del conductor en la base
-    await fetch(`${API_URL}/conductores/${dni}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        latitud: latitud,
-        longitud: longitud,
-        ultimaActualizacion: timestamp,
-        activo: true,
-        compartiendo: true
-      })
-    });
-  } catch (err) {
-    console.error('Error enviando ubicación:', err);
-  }
-}
 
 
-        */
 
         // Detener seguimiento de ubicación
         function detenerSeguimiento() {

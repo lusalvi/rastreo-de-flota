@@ -120,7 +120,6 @@
 
   <!-- Script principal -->
   <script>
-
     // Variables globales
     let map, directionsService, directionsRenderer;
     let conductores = [];
@@ -129,7 +128,7 @@
     let refreshInterval;
     let rutasActivas = {};
     let infoWindows = [];
-
+    
     // Inicializar la aplicación cuando se carga el script de Google Maps
     function initMap() {
       console.log("Mapa de monitoreo inicializado correctamente.");
@@ -185,25 +184,55 @@
         }
 
         const data = await response.json();
-        // conductores = data.filter(c => c.activo === true || c.compartiendo === true);
 
+        // CAMBIO IMPORTANTE: Mejorar la lógica de filtrado de conductores activos
         conductores = data.filter(c => {
+          // Verificar si está compartiendo ubicación (verdadero booleano, string "true" o 1)
           const compartiendo = c.compartiendo === true || c.compartiendo === "true" || c.compartiendo === 1;
+
+          // Verificar si está activo
           const activo = c.activo === true || c.activo === "true" || c.activo === 1;
-          return compartiendo || activo;
+
+          // Verificar si tiene coordenadas válidas
+          const tieneUbicacion = c.latitud && c.longitud &&
+            !isNaN(parseFloat(c.latitud)) &&
+            !isNaN(parseFloat(c.longitud));
+
+          // Verificar si la última actualización es reciente (dentro de los últimos 2 minutos)
+          let actualizacionReciente = true;
+          if (c.ultimaActualizacion) {
+            const ultima = new Date(c.ultimaActualizacion);
+            const ahora = new Date();
+            // Considerar conductores con actualizaciones en los últimos 2 minutos
+            const diferenciaSegundos = (ahora - ultima) / 1000;
+            actualizacionReciente = !isNaN(ultima) && diferenciaSegundos < 120;
+          }
+
+          return (compartiendo || activo) && tieneUbicacion && actualizacionReciente;
         });
 
-        console.log("Todos los conductores recibidos:", data.map(c => ({
+        console.log("Conductores filtrados que se muestran:", conductores.map(c => ({
           dni: c.dni,
+          nombre: c.nombreCompleto,
           compartiendo: c.compartiendo,
           activo: c.activo,
-          lat: c.latitud,
-          lng: c.longitud
+          latitud: c.latitud,
+          longitud: c.longitud,
+          ultimaActualizacion: c.ultimaActualizacion
         })));
 
         // Actualizar contador de conductores
         document.getElementById('conductorCount').textContent = conductores.length;
-        document.getElementById('vehicleCount').textContent = conductores.filter(c => c.vehiculo).length;
+
+        // Contar vehículos en ruta (conductores con vehículo asignado)
+        const vehiculosEnRuta = conductores.filter(c => {
+          return c.vehiculo && (
+            (typeof c.vehiculo === 'object' && c.vehiculo.patente) ||
+            (typeof c.vehiculo === 'string' && c.vehiculo.trim() !== '')
+          );
+        }).length;
+
+        document.getElementById('vehicleCount').textContent = vehiculosEnRuta;
 
         // Mostrar conductores en la lista
         mostrarConductores(conductores);
@@ -216,6 +245,8 @@
 
       } catch (error) {
         console.error('Error al cargar datos:', error);
+        document.getElementById('conductorCount').textContent = '0';
+        document.getElementById('vehicleCount').textContent = '0';
         alert('Error al cargar datos: ' + error.message);
       }
     }
@@ -231,22 +262,34 @@
       }
 
       conductores.forEach(conductor => {
-        const patente = typeof conductor.vehiculo === 'object'
-          ? conductor.vehiculo?.patente
-          : conductor.vehiculo;
+        // Determinar patente del vehículo (manejar tanto objetos como strings)
+        let patente = 'No asignado';
+        if (conductor.vehiculo) {
+          patente = typeof conductor.vehiculo === 'object'
+            ? (conductor.vehiculo.patente || 'No asignado')
+            : conductor.vehiculo;
+        }
 
         const card = document.createElement('div');
         card.className = 'conductor-card';
         card.dataset.dni = conductor.dni;
+
+        // Determinar estado: verde para compartiendo ubicación, amarillo para activo sin compartir
+        const estadoColor = conductor.compartiendo ? '#28a745' : '#ffc107';
+
+        // Formatear la última actualización
+        const ultimaActualizacion = conductor.ultimaActualizacion
+          ? new Date(conductor.ultimaActualizacion).toLocaleTimeString()
+          : 'Desconocida';
+
         card.innerHTML = `
-      <div class="conductor-status" style="background-color: ${conductor.compartiendo ? '#28a745' : '#ffc107'}"></div>
+      <div class="conductor-status" style="background-color: ${estadoColor}"></div>
       <div class="conductor-info">
-        <div class="conductor-name">${conductor.nombreCompleto}</div>
+        <div class="conductor-name">${conductor.nombreCompleto || 'Conductor ' + conductor.dni}</div>
         <div class="conductor-details">
           <div>DNI: ${conductor.dni}</div>
-          <div>Vehículo: ${patente || 'No asignado'}</div>
-          ${conductor.latitud && conductor.longitud ?
-            `<div class="small text-muted">Última actualización: ${new Date(conductor.ultimaActualizacion || Date.now()).toLocaleTimeString()}</div>` : ''}
+          <div>Vehículo: ${patente}</div>
+          <div class="small text-muted">Última actualización: ${ultimaActualizacion}</div>
         </div>
       </div>
     `;
@@ -268,13 +311,14 @@
       });
     }
 
+
     // Filtrar conductores por búsqueda
     function filtrarConductores() {
       const busqueda = document.getElementById('searchConductor').value.toLowerCase();
 
       const conductoresFiltrados = conductores.filter(c =>
-        c.nombreCompleto.toLowerCase().includes(busqueda) ||
-        c.dni.toLowerCase().includes(busqueda)
+        (c.nombreCompleto && c.nombreCompleto.toLowerCase().includes(busqueda)) ||
+        (c.dni && c.dni.toLowerCase().includes(busqueda))
       );
 
       mostrarConductores(conductoresFiltrados);
@@ -284,88 +328,96 @@
     function mostrarConductoresEnMapa(conductores) {
       // Cerrar todas las ventanas de info abiertas
       infoWindows.forEach(info => info.close());
-      infoWindows = []
+      infoWindows = [];
 
       // Limpiar marcadores anteriores
       limpiarMarcadores();
 
       conductores.forEach(conductor => {
-        // Solo mostrar conductores que comparten ubicación y tienen coordenadas
-        // if (conductor.compartiendo && conductor.latitud && conductor.longitud) {
-        if ((conductor.compartiendo === true || conductor.compartiendo === "true") && lat && lng){
+        const lat = parseFloat(conductor.latitud);
+        const lng = parseFloat(conductor.longitud);
 
-          const lat = parseFloat(conductor.latitud);
-          const lng = parseFloat(conductor.longitud);
-
-          console.log("Mostrando en mapa:", conductor.nombreCompleto, lat, lng, conductor.compartiendo);
-
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const patente = typeof conductor.vehiculo === 'object'
-              ? conductor.vehiculo?.patente
+        // Solo mostrar conductores con coordenadas válidas
+        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+          // Determinar patente del vehículo
+          let patente = 'No asignado';
+          if (conductor.vehiculo) {
+            patente = typeof conductor.vehiculo === 'object'
+              ? (conductor.vehiculo.patente || 'No asignado')
               : conductor.vehiculo;
-
-            const marker = new google.maps.Marker({
-              position: { lat, lng },
-              map: map,
-              title: conductor.nombreCompleto,
-              icon: {
-                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                scaledSize: new google.maps.Size(40, 40)
-              },
-              animation: google.maps.Animation.DROP
-            });
-
-            // Crear ventana de información con más detalles
-            const infoWindow = new google.maps.InfoWindow({
-              content: `
-            <div class="info-window">
-              <h5>${conductor.nombreCompleto}</h5>
-              <p><strong>DNI:</strong> ${conductor.dni}</p>
-              <p><strong>Vehículo:</strong> ${patente || 'No asignado'}</p>
-              <p><strong>Última actualización:</strong> ${new Date(conductor.ultimaActualizacion || Date.now()).toLocaleString()}</p>
-              <div class="mt-2">
-                <button id="verRuta-${conductor.dni}" class="btn btn-sm btn-primary">Ver ruta</button>
-                <button id="ocultarRuta-${conductor.dni}" class="btn btn-sm btn-secondary ml-2">Ocultar ruta</button>
-              </div>
-            </div>
-          `
-            });
-
-            infoWindows.push(infoWindow);
-
-            // Evento click para mostrar info
-            marker.addListener('click', () => {
-              // Cerrar todas las ventanas de info abiertas
-              infoWindows.forEach(info => info.close());
-
-              // Mostrar la ventana de info de este conductor
-              infoWindow.open(map, marker);
-
-              // Agregar evento a los botones una vez que la ventana esté visible
-              setTimeout(() => {
-                const btnVerRuta = document.getElementById(`verRuta-${conductor.dni}`);
-                if (btnVerRuta) {
-                  btnVerRuta.addEventListener('click', () => mostrarRutaConductor(conductor.dni));
-                }
-
-                const btnOcultarRuta = document.getElementById(`ocultarRuta-${conductor.dni}`);
-                if (btnOcultarRuta) {
-                  btnOcultarRuta.addEventListener('click', () => ocultarRutaConductor(conductor.dni));
-                }
-              }, 100);
-            });
-
-            // Guardar referencia al marcador
-            marker.infoWindow = infoWindow;
-            markers.push(marker);
-            conductorMarkers[conductor.dni] = marker;
           }
+
+          // Crear marcador con color basado en estado: azul para compartiendo ubicación, amarillo para solo activo
+          const iconoURL = conductor.compartiendo
+            ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            : 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+
+          const marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: map,
+            title: conductor.nombreCompleto || 'Conductor ' + conductor.dni,
+            icon: {
+              url: iconoURL,
+              scaledSize: new google.maps.Size(40, 40)
+            },
+            animation: google.maps.Animation.DROP
+          });
+
+          // Crear ventana de información con más detalles
+          const ultimaActualizacion = conductor.ultimaActualizacion
+            ? new Date(conductor.ultimaActualizacion).toLocaleString()
+            : 'Desconocida';
+
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+          <div class="info-window">
+            <h5>${conductor.nombreCompleto || 'Conductor ' + conductor.dni}</h5>
+            <p><strong>DNI:</strong> ${conductor.dni}</p>
+            <p><strong>Vehículo:</strong> ${patente}</p>
+            <p><strong>Estado:</strong> ${conductor.compartiendo ? 'Compartiendo ubicación' : 'Activo'}</p>
+            <p><strong>Última actualización:</strong> ${ultimaActualizacion}</p>
+            <div class="mt-2">
+              <button id="verRuta-${conductor.dni}" class="btn btn-sm btn-primary">Ver ruta</button>
+              <button id="ocultarRuta-${conductor.dni}" class="btn btn-sm btn-secondary ml-2">Ocultar ruta</button>
+            </div>
+          </div>
+        `
+          });
+
+          infoWindows.push(infoWindow);
+
+          // Evento click para mostrar info
+          marker.addListener('click', () => {
+            // Cerrar todas las ventanas de info abiertas
+            infoWindows.forEach(info => info.close());
+
+            // Mostrar la ventana de info de este conductor
+            infoWindow.open(map, marker);
+
+            // Agregar evento a los botones una vez que la ventana esté visible
+            setTimeout(() => {
+              const btnVerRuta = document.getElementById(`verRuta-${conductor.dni}`);
+              if (btnVerRuta) {
+                btnVerRuta.addEventListener('click', () => mostrarRutaConductor(conductor.dni));
+              }
+
+              const btnOcultarRuta = document.getElementById(`ocultarRuta-${conductor.dni}`);
+              if (btnOcultarRuta) {
+                btnOcultarRuta.addEventListener('click', () => ocultarRutaConductor(conductor.dni));
+              }
+            }, 100);
+          });
+
+          // Guardar referencia al marcador
+          marker.infoWindow = infoWindow;
+          markers.push(marker);
+          conductorMarkers[conductor.dni] = marker;
         }
       });
 
-      // Si no hay marcadores, mostrar mensaje
+      // Si no hay marcadores, mostrar mensaje en consola
       if (markers.length === 0) {
-        console.log('No hay conductores compartiendo ubicación');
+        console.log('No hay conductores con ubicación válida para mostrar en el mapa');
       }
     }
 
@@ -378,42 +430,60 @@
 
     // Obtener rutas activas de todos los conductores
     async function obtenerRutasActivas() {
-      for (const conductor of conductores) {
-        if (conductor.compartiendo && conductor.vehiculo) {
-          const patente = typeof conductor.vehiculo === 'object'
-            ? conductor.vehiculo?.patente
-            : conductor.vehiculo;
+      try {
+        // Obtener todos los pasajeros de una sola vez para minimizar llamadas a la API
+        const res = await fetch(`${API_URL}/pasajeros`);
+        if (!res.ok) {
+          throw new Error('Error al obtener datos de pasajeros');
+        }
 
-          if (patente) {
-            try {
-              // Obtener pasajeros asignados a este vehículo
-              const res = await fetch(`${API_URL}/pasajeros`);
-              if (res.ok) {
-                const pasajeros = await res.json();
+        const todosLosPasajeros = await res.json();
 
-                // Filtrar pasajeros por la patente del vehículo
-                const pasajerosFiltrados = pasajeros.filter(p => {
-                  const patenteAsig = typeof p.vehiculoasignado === 'object'
-                    ? p.vehiculoasignado?.patente?.trim()
-                    : p.vehiculoasignado?.trim();
-                  return patenteAsig === patente;
-                });
+        // Procesar pasajeros para cada conductor
+        for (const conductor of conductores) {
+          // Solo procesar conductores con vehículo asignado
+          if (conductor.vehiculo) {
+            let patente;
 
-                if (pasajerosFiltrados.length > 0) {
-                  // Guardar los pasajeros en el objeto de rutas activas
-                  rutasActivas[conductor.dni] = {
-                    conductor: conductor,
-                    pasajeros: pasajerosFiltrados,
-                    mostrandoRuta: false,
-                    renderer: null
-                  };
+            // Determinar la patente del vehículo del conductor
+            if (typeof conductor.vehiculo === 'object') {
+              patente = conductor.vehiculo.patente?.trim();
+            } else if (typeof conductor.vehiculo === 'string') {
+              patente = conductor.vehiculo.trim();
+            }
+
+            if (patente) {
+              // Filtrar pasajeros asignados a este vehículo
+              const pasajerosFiltrados = todosLosPasajeros.filter(p => {
+                let patenteAsignada;
+
+                // Determinar la patente asignada al pasajero
+                if (typeof p.vehiculoasignado === 'object') {
+                  patenteAsignada = p.vehiculoasignado?.patente?.trim();
+                } else if (typeof p.vehiculoasignado === 'string') {
+                  patenteAsignada = p.vehiculoasignado.trim();
                 }
+
+                return patenteAsignada === patente;
+              });
+
+              if (pasajerosFiltrados.length > 0) {
+                // Guardar los pasajeros en el objeto de rutas activas
+                rutasActivas[conductor.dni] = {
+                  conductor: conductor,
+                  pasajeros: pasajerosFiltrados,
+                  mostrandoRuta: false,
+                  renderer: null
+                };
               }
-            } catch (error) {
-              console.error(`Error al obtener ruta para ${conductor.nombreCompleto}:`, error);
             }
           }
         }
+
+        console.log("Rutas activas cargadas:", Object.keys(rutasActivas).length);
+
+      } catch (error) {
+        console.error('Error al obtener rutas activas:', error);
       }
     }
 
@@ -461,9 +531,16 @@
 
       // Convertir las paradas a waypoints para la API de Google Maps
       const waypoints = pasajeros
-        .filter(p => p.latitud && p.longitud && !isNaN(parseFloat(p.latitud)) && !isNaN(parseFloat(p.longitud)))
+        .filter(p => {
+          const lat = parseFloat(p.latitud);
+          const lng = parseFloat(p.longitud);
+          return lat && lng && !isNaN(lat) && !isNaN(lng);
+        })
         .map(p => ({
-          location: { lat: parseFloat(p.latitud), lng: parseFloat(p.longitud) },
+          location: {
+            lat: parseFloat(p.latitud),
+            lng: parseFloat(p.longitud)
+          },
           stopover: true
         }));
 
@@ -489,7 +566,7 @@
             text: (index + 1).toString(),
             color: 'white'
           },
-          title: `Parada ${index + 1}: ${pasajeros[index].nombreCompleto}`
+          title: `Parada ${index + 1}: ${pasajeros[index].nombreCompleto || 'Pasajero'}`
         });
 
         markers.push(pasajeroMarker);
@@ -523,6 +600,7 @@
           map.fitBounds(bounds);
         } else {
           console.error('Error al trazar ruta:', status);
+          alert('No se pudo trazar la ruta. Error: ' + status);
         }
       });
     }
