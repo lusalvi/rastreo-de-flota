@@ -28,18 +28,18 @@
 
  .split-form .image-side {
    flex: 1;
-   background: #7A5B5A;
+   background: #b3a5a5;
    padding: 2rem;
    display: flex;
    flex-direction: column;
    justify-content: center;
    align-items: center;
-   color: white;
+   color: black;
    text-align: center;
  }
 
  .split-form .image-side .logo-img{
-  width: 100px;
+  width: 250px;
   height: auto;
   margin-bottom: 1rem;
  }
@@ -60,14 +60,14 @@
  }
 
  .split-form input:focus {
-   border-bottom-color: #FF6B6B;
+   border-bottom-color: #7A5B5A;
  }
 
  .split-form button {
    width: 100%;
    padding: 1rem;
    margin-top: 1.5rem;
-   background: #FF6B6B;
+   background: #7A5B5A;
    color: white;
    border: none;
    border-radius: 25px;
@@ -93,7 +93,7 @@
  }
 
  #confirmar:hover {
-   background-color: #A89F91;
+   background-color: #b3a5a5;
  }
 
  #titulo {
@@ -116,7 +116,7 @@
  button:hover,
  .btn:active,
  button:active {
-   background-color: #A89F91;
+   background-color: #b3a5a5;
    transition: 0.2s;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
  }
