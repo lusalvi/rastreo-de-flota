@@ -492,6 +492,45 @@
             }
         }
 
+        //PROBAR
+        /*
+
+        async function enviarUbicacion(latitud, longitud) {
+  try {
+    const timestamp = new Date().toISOString();
+
+    // Enviar ubicación como nuevo registro
+    await fetch(`${API_URL}/ubicacion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dni: dni,
+        latitud: latitud,
+        longitud: longitud,
+        timestamp: timestamp
+      })
+    });
+
+    // ACTUALIZAR datos del conductor en la base
+    await fetch(`${API_URL}/conductores/${dni}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        latitud: latitud,
+        longitud: longitud,
+        ultimaActualizacion: timestamp,
+        activo: true,
+        compartiendo: true
+      })
+    });
+  } catch (err) {
+    console.error('Error enviando ubicación:', err);
+  }
+}
+
+
+        */
+
         // Detener seguimiento de ubicación
         function detenerSeguimiento() {
             if (watchId) {
