@@ -1,69 +1,122 @@
-html, body {
-  height: 100%;
-  background-color: #F1ECE7;
- /*  font-family: 'Russo One'; */
-}
+ * {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ }
 
-.form-signin {
-  max-width: 330px;
-  padding: 1rem;
-}
+ body {
+   min-height: 100vh;
+   display: flex;
+   flex-direction: column;
+   gap: 3rem;
+   padding: 2rem;
+   background: #f0f2f5;
+ }
 
-.form-control:focus {
-  border-color: #7A5B5A; /* Cambia el color del borde */
-  box-shadow: 0 0 20px #A89F91; /* Efecto de resplandor rosa*/
-  outline: none; /* Elimina el contorno predeterminado */
-}
+ /* Split Layout Form */
+ .split-form {
+   display: flex;
+   background: white;
+   border-radius: 20px;
+   overflow: hidden;
+   width: 100%;
+   max-width: 800px;
+   margin: 0 auto;
+   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+ }
 
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
+ .split-form .image-side {
+   flex: 1;
+   background: #7A5B5A;
+   padding: 2rem;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   color: white;
+   text-align: center;
+ }
 
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
+ .split-form .image-side .logo-img{
+  width: 100px;
+  height: auto;
+  margin-bottom: 1rem;
+ }
 
-/* Estilos Importantes */
+ .split-form .form-side {
+   flex: 1;
+   padding: 3rem;
+ }
 
-#formulario {
-  font-family: 'Russo One';
-}
+ .split-form input {
+   width: 100%;
+   padding: 1rem;
+   margin: 0.5rem 0;
+   border: none;
+   border-bottom: 2px solid #eee;
+   outline: none;
+   transition: border-color 0.3s;
+ }
 
-#nombreEmpresa{
-  color:#2E2E32;
-}
+ .split-form input:focus {
+   border-bottom-color: #FF6B6B;
+ }
 
-#confirmar{
-  background-color:#7A5B5A;
-  border: 0px;
-}
+ .split-form button {
+   width: 100%;
+   padding: 1rem;
+   margin-top: 1.5rem;
+   background: #FF6B6B;
+   color: white;
+   border: none;
+   border-radius: 25px;
+   cursor: pointer;
+   font-weight: bold;
+   transition: transform 0.3s;
+ }
 
-#confirmar:hover{
-  background-color: #A89F91;
-}
+ .split-form button:hover {
+   transform: translateY(-2px);
+ }
 
-#titulo{
-  color: #5C565D;
-  font-size: 25px;
-}
 
-.creditos{
-  display: flex;
-  justify-content: center;
-  color: #5C565D;
-}
+ /* Estilos Importantes */
 
-.modal-footer button{
-  background-color: #7A5B5A;
-  border: 0px;
-}
+ #nombreEmpresa {
+   color: #2E2E32;
+ }
 
-.btn:hover, button:hover{
-  background-color: #A89F91;
-  transition: 0.2s;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-}
+ #confirmar {
+   background-color: #7A5B5A;
+   border: 0px;
+ }
+
+ #confirmar:hover {
+   background-color: #A89F91;
+ }
+
+ #titulo {
+   color: #5C565D;
+   font-size: 25px;
+ }
+
+ .creditos {
+   display: flex;
+   justify-content: center;
+   color: #5C565D;
+ }
+
+ .modal-footer button {
+   background-color: #7A5B5A;
+   border: 0px;
+ }
+
+ .btn:hover,
+ button:hover,
+ .btn:active,
+ button:active {
+   background-color: #A89F91;
+   transition: 0.2s;
+   box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+ }
