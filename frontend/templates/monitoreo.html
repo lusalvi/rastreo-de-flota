@@ -12,7 +12,7 @@
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
   <title>Sistema de Rastreo de Flotas | CENTRO DE MONITOREO</title>
   <!-- SCRIPT -->
-  <script src="../js/script.js"></script>
+  <!--  <script src="../js/script.js"></script>  -->
   <script>
     const ruta = window.location.pathname;
     const esLogin = ruta.includes('logueo.html');
@@ -55,16 +55,12 @@
 
 
   <div class="container mb-4">
-    <h3>Centro de Monitoreo de Flotas</h3>
+   <!--  <h3>Centro de monitoreo de flotas</h3> -->
 
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-value" id="conductorCount">0</div>
         <div class="stat-label">Conductores activos</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="vehicleCount">0</div>
-        <div class="stat-label">Vehículos en ruta</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="currentTime">--:--</div>
@@ -73,7 +69,7 @@
     </div>
 
     <div class="d-flex gap-2 mb-4">
-      <button id="refreshData" class="btn btn-primary">
+      <button id="refreshData" class="btn btn-primary" style="background-color:#2E2E32">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise"
           viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
@@ -121,6 +117,7 @@
   <!-- Script principal -->
   <script>
     // Variables globales
+    const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
     let map, directionsService, directionsRenderer;
     let conductores = [];
     let markers = [];
@@ -128,12 +125,13 @@
     let refreshInterval;
     let rutasActivas = {};
     let infoWindows = [];
-    
+   
+
     // Inicializar la aplicación cuando se carga el script de Google Maps
     function initMap() {
       console.log("Mapa de monitoreo inicializado correctamente.");
       // Coordenadas centrales (Mendoza)
-      const center = { lat: -32.8894587, lng: -68.8458386 };
+      const center = { lat: -32.964494, lng: -68.706340};
 
       // Configuración del mapa
       map = new google.maps.Map(document.getElementById("map"), {
@@ -143,6 +141,34 @@
         fullscreenControl: true,
         streetViewControl: true,
         zoomControl: true
+      });
+       // Agregar marcador fijo para la ubicación de la empresa
+      const empresaLocation = { lat: -32.962028, lng: -68.718583 };
+      const empresaMarker = new google.maps.Marker({
+        position: empresaLocation,
+        map: map,
+        title: 'SAN GUILLERMO S.A.',
+        icon: {
+          url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+          scaledSize: new google.maps.Size(50, 50)
+        },
+        zIndex: 1000, // Para asegurar que esté por encima de otros marcadores
+        animation: google.maps.Animation.DROP
+      });
+      
+      // Agregar ventana de información para la empresa
+      const empresaInfoWindow = new google.maps.InfoWindow({
+        content: `
+          <div class="info-window">
+            <h5>GeoBuild S.A.</h5>
+            <p><strong>Sede principal</strong></p>
+          </div>
+        `
+      });
+      
+      // Mostrar info al hacer clic en el marcador de la empresa
+      empresaMarker.addListener('click', () => {
+        empresaInfoWindow.open(map, empresaMarker);
       });
 
       // Inicializar servicios de direcciones
@@ -163,6 +189,7 @@
 
       // Configurar actualización automática cada 30 segundos
       refreshInterval = setInterval(actualizarDatos, 30000);
+
     }
 
     // Actualizar la hora actual
@@ -223,16 +250,6 @@
 
         // Actualizar contador de conductores
         document.getElementById('conductorCount').textContent = conductores.length;
-
-        // Contar vehículos en ruta (conductores con vehículo asignado)
-        const vehiculosEnRuta = conductores.filter(c => {
-          return c.vehiculo && (
-            (typeof c.vehiculo === 'object' && c.vehiculo.patente) ||
-            (typeof c.vehiculo === 'string' && c.vehiculo.trim() !== '')
-          );
-        }).length;
-
-        document.getElementById('vehicleCount').textContent = vehiculosEnRuta;
 
         // Mostrar conductores en la lista
         mostrarConductores(conductores);
@@ -527,8 +544,8 @@
       };
 
       // Destino (ubicación de la empresa)
-      const destino = { lat: -32.962028, lng: -68.718583 }; // El ITU como destino
-
+      const destino = { lat: -32.962028, lng: -68.718583 }; // SAN GUILLERMO S.A como destino
+      
       // Convertir las paradas a waypoints para la API de Google Maps
       const waypoints = pasajeros
         .filter(p => {
@@ -633,7 +650,7 @@
 
     // Centrar mapa en Mendoza
     function centrarMapa() {
-      map.setCenter({ lat: -32.8894587, lng: -68.8458386 });
+      map.setCenter({ lat: -32.964494, lng: -68.706340 });
       map.setZoom(13);
     }
 
