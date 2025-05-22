@@ -31,7 +31,6 @@
     // Inicializar EmailJS
     emailjs.init("Z-9x506U55yhP1flZ");
   </script>
-
   <!-- Script principal -->
   <script src="../js/script.js"></script>
 </head>
@@ -44,7 +43,7 @@
     <div class="split-form">
       <div class="image-side">
         <!-- Logo-Nombre -->
-          <img src="../img/iconoSF.png" alt="Logo Rastreo de flotas" class="logo-img">
+        <img src="../img/iconoSF.png" alt="Logo Rastreo de flotas" class="logo-img">
       </div>
 
       <div class="form-side">
@@ -79,10 +78,16 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <p class="subtitulo">Hemos enviado un código a tu correo electrónico</p>
           <div class="form-group">
-            <label for="codigoIngresado">Ingresá el código de 6 dígitos</label>
-            <input type="text" class="form-control" id="codigoIngresado" placeholder="Código de verificación">
+            <label for="codigoIngresado">Ingresá el código que enviamos a tu correo electrónico</label>
+            <div class="code-input">
+              <input type="tel" maxlength="1" />
+              <input type="tel" maxlength="1" />
+              <input type="tel" maxlength="1" />
+              <input type="tel" maxlength="1" />
+              <input type="tel" maxlength="1" />
+              <input type="tel" maxlength="1" />
+            </div>
           </div>
         </div>
         <div class="modal-footer">

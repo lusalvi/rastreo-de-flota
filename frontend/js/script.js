@@ -61,6 +61,44 @@ function cerrarSesion() {
   window.location.href = `${BASE_PATH}/templates/logueo.html`;
 }
 
+// código para el input de 6 dígitos
+
+  const inputs = document.querySelectorAll('.code-input input');
+
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+      const value = input.value;
+      if (!/^[0-9]$/.test(value)) {
+        input.value = '';
+        return;
+      }
+      if (index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        if (input.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        }
+      }
+    });
+
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const paste = e.clipboardData.getData('text').replace(/\D/g, '');
+      [...paste].forEach((char, i) => {
+        if (inputs[i]) {
+          inputs[i].value = char;
+        }
+      });
+      if (inputs[paste.length]) {
+        inputs[paste.length].focus();
+      }
+    });
+  });
+
 // -------------------- FETCH GENERAL --------------------
 async function fetchAPI(endpoint, method = 'GET', data = null) {
   try {

@@ -80,6 +80,32 @@
    transform: translateY(-2px);
  }
 
+/* Verificacion */
+
+.code-input {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.code-input input {
+  width: 50px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.code-input input:focus {
+  border-color: #7A5B5A;
+  outline: none;
+  box-shadow: 0 0 4px rgba(122, 91, 90, 0.3);
+}
+
 
  /* Estilos Importantes */
 
