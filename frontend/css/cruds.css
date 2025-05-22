@@ -12,8 +12,7 @@
 }
 
 .card {
-    background-color: #5C565D;
-    border: 1px solid #7A5B5A;
+    background-color: #fefcfc;
     border-radius: 10px;
     padding: 30px;
     margin-top: 40px;
@@ -21,7 +20,7 @@
 }
 
 .card h2{
-    color: white;
+    color: #7A5B5A;
     margin-bottom: 20px;
 }
 
@@ -63,6 +62,59 @@ a{
     margin-top: 20px;
 }
 
+#conductorTable,
+#pasajeroTable,
+#vehiculoTable {
+  width: 100%;
+  border: 1px solid #efe9e9;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+  background-color: #cdc7c7;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+#conductorTable th,
+#pasajeroTable th,
+#vehiculoTable th {
+  background-color: #7A5B5A;
+  color: white;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #e0dede;
+}
+
+#conductorTable td,
+#pasajeroTable td,
+#vehiculoTable td {
+  padding: 10px 14px;
+  border: 1px solid #efe9e9;
+  background-color: #ffffff;
+}
+
+#conductorTable tr:hover td,
+#pasajeroTable tr:hover td,
+#vehiculoTable tr:hover td {
+  background-color: #f0e7e7;  
+}
+
+#conductorTable td:last-child {
+  white-space: nowrap;
+  width: 1%;
+}
+
+#conductorTable .table-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/*
 #conductoTable, #pasajeroTable, #vehiculoTable {
     width: 100%;
     border-collapse: collapse;
@@ -87,7 +139,7 @@ a{
 #conductorTable tr:hover, #pasajeroTable tr:hover, #vehiculoTable tr:hover {
     background-color: #7A5B5A;
 }
-
+*/
 .form-group {
     margin-bottom: 20px;
 }
