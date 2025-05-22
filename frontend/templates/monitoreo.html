@@ -55,7 +55,7 @@
 
 
   <div class="container mb-4">
-   <!--  <h3>Centro de monitoreo de flotas</h3> -->
+    <!--  <h3>Centro de monitoreo de flotas</h3> -->
 
     <div class="stats-container">
       <div class="stat-card">
@@ -125,13 +125,13 @@
     let refreshInterval;
     let rutasActivas = {};
     let infoWindows = [];
-   
+
 
     // Inicializar la aplicación cuando se carga el script de Google Maps
     function initMap() {
       console.log("Mapa de monitoreo inicializado correctamente.");
       // Coordenadas centrales (Mendoza)
-      const center = { lat: -32.964494, lng: -68.706340};
+      const center = { lat: -32.964494, lng: -68.706340 };
 
       // Configuración del mapa
       map = new google.maps.Map(document.getElementById("map"), {
@@ -142,7 +142,7 @@
         streetViewControl: true,
         zoomControl: true
       });
-       // Agregar marcador fijo para la ubicación de la empresa
+      // Agregar marcador fijo para la ubicación de la empresa
       const empresaLocation = { lat: -32.962028, lng: -68.718583 };
       const empresaMarker = new google.maps.Marker({
         position: empresaLocation,
@@ -155,7 +155,7 @@
         zIndex: 1000, // Para asegurar que esté por encima de otros marcadores
         animation: google.maps.Animation.DROP
       });
-      
+
       // Agregar ventana de información para la empresa
       const empresaInfoWindow = new google.maps.InfoWindow({
         content: `
@@ -165,11 +165,70 @@
           </div>
         `
       });
-      
+
       // Mostrar info al hacer clic en el marcador de la empresa
       empresaMarker.addListener('click', () => {
         empresaInfoWindow.open(map, empresaMarker);
       });
+
+      // 🚗 Autitos simulados
+      const conductoresSimulados = [
+        {
+          dni: '45616517',
+          nombreCompleto: 'Juan Perez',
+          latitud: -32.95065,
+          longitud: -68.74465,
+          compartiendo: true,
+          activo: true,
+          ultimaActualizacion: new Date().toISOString(),
+          vehiculo: 'ABC123'
+        },
+        {
+          dni: '35123456',
+          nombreCompleto: 'Eduardo Rojas',
+          latitud: -32.92961,
+          longitud: -68.68371,
+          compartiendo: true,
+          activo: true,
+          ultimaActualizacion: new Date().toISOString(),
+          vehiculo: 'DEF321'
+        }
+      ];
+
+      conductores = conductoresSimulados;
+      mostrarConductores(conductores);           // 👈 Muestra en lista lateral
+      mostrarConductoresEnMapa(conductores);     // 👈 Muestra en el mapa
+
+      document.getElementById('conductorCount').textContent = conductores.length;
+
+      // Mostrar autitos en el mapa con ícono personalizado
+      conductoresSimulados.forEach(conductor => {
+        const marker = new google.maps.Marker({
+          position: { lat: conductor.latitud, lng: conductor.longitud },
+          map: map,
+          title: conductor.nombreCompleto,
+          icon: {
+            url: 'https://maps.google.com/mapfiles/kml/shapes/cabs.png', // Ícono de auto tipo taxi
+            scaledSize: new google.maps.Size(40, 40)
+          },
+          animation: google.maps.Animation.DROP
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+        <div class="info-window">
+          <h6>${conductor.nombreCompleto}</h6>
+          <p><strong>DNI:</strong> ${conductor.dni}</p>
+          <p><strong>Vehículo:</strong> ${conductor.vehiculo}</p>
+        </div>
+      `
+        });
+
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+      });
+
 
       // Inicializar servicios de direcciones
       directionsService = new google.maps.DirectionsService();
@@ -182,10 +241,10 @@
 
       // Actualizar la hora cada segundo
       actualizarHora();
-      setInterval(actualizarHora, 1000);
+      //setInterval(actualizarHora, 1000);
 
       // Cargar datos iniciales
-      cargarDatos();
+      // cargarDatos();
 
       // Configurar actualización automática cada 30 segundos
       refreshInterval = setInterval(actualizarDatos, 30000);
@@ -545,7 +604,7 @@
 
       // Destino (ubicación de la empresa)
       const destino = { lat: -32.962028, lng: -68.718583 }; // SAN GUILLERMO S.A como destino
-      
+
       // Convertir las paradas a waypoints para la API de Google Maps
       const waypoints = pasajeros
         .filter(p => {
