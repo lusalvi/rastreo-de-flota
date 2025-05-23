@@ -12,7 +12,6 @@
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
   <title>Sistema de Rastreo de Flotas | CENTRO DE MONITOREO</title>
   <!-- SCRIPT -->
-  <!--  <script src="../js/script.js"></script>  -->
   <script>
     const ruta = window.location.pathname;
     const esLogin = ruta.includes('logueo.html');
@@ -23,8 +22,6 @@
       window.location.replace("logueo.html");
     }
   </script>
-
-
 </head>
 
 <body>
@@ -53,10 +50,7 @@
     </header>
   </div>
 
-
   <div class="container mb-4">
-    <!--  <h3>Centro de monitoreo de flotas</h3> -->
-
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-value" id="conductorCount">0</div>
@@ -87,6 +81,15 @@
         </svg>
         Centrar mapa
       </button>
+      <button id="clearRoutes" class="btn btn-warning" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle"
+          viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+        </svg>
+        Limpiar rutas
+      </button>
     </div>
   </div>
 
@@ -114,6 +117,12 @@
     </div>
   </div>
 
+  <!-- Notificación -->
+  <div id="notificacionDesconexion"
+    style="position: fixed; bottom: 20px; right: 20px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px 16px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: none; z-index: 9999;">
+    🔴 Conductor desconectado
+  </div>
+
   <!-- Script principal -->
   <script>
     // Script para Centro de Monitoreo - Sistema de Rastreo de Flotas
@@ -125,6 +134,12 @@
     let updateInterval;
     let searchTimeout;
 
+    // Variables para manejo de rutas
+    let directionsService;
+    let directionsRenderer;
+    let routeMarkersMap = new Map(); // Para almacenar marcadores de rutas por conductor
+    let currentRouteShowing = null; // DNI del conductor cuya ruta se está mostrando
+
     // Función para inicializar Google Maps
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -134,6 +149,18 @@
         fullscreenControl: true,
         streetViewControl: false,
         gestureHandling: 'greedy'
+      });
+
+      // Inicializar servicios de direcciones
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: '#0d6efd',
+          strokeWeight: 5,
+          strokeOpacity: 0.7
+        }
       });
 
       console.log('Mapa inicializado');
@@ -163,34 +190,22 @@
         }
 
         const conductores = await response.json();
-
-        // Filtrar solo conductores activos y compartiendo ubicación
-        /*const activos = conductores.filter(conductor =>
-          conductor.activo === true &&
-          conductor.compartiendo === true &&
-          conductor.latitud &&
-          conductor.longitud &&
-          !isNaN(parseFloat(conductor.latitud)) &&
-          !isNaN(parseFloat(conductor.longitud))
-        );*/
-
         const ahora = new Date();
 
         const activos = conductores.filter(conductor => {
           const lat = parseFloat(conductor.latitud);
           const lng = parseFloat(conductor.longitud);
           const ultima = new Date(conductor.ultimaActualizacion);
-          const diferenciaMin = (ahora - ultima) / 1000 / 60; // minutos
+          const diferenciaMin = (ahora - ultima) / 1000 / 60;
 
           return (
             conductor.activo === true &&
             conductor.compartiendo === true &&
             !isNaN(lat) &&
             !isNaN(lng) &&
-            diferenciaMin <= 1 // 💡 Si pasó más de 5 minutos, se excluye
+            diferenciaMin <= 1
           );
         });
-
 
         console.log(`Conductores activos: ${activos.length}`);
         return activos;
@@ -198,6 +213,241 @@
         console.error('Error obteniendo conductores:', error);
         return [];
       }
+    }
+
+    // Obtener pasajeros asignados a un vehículo
+    async function obtenerPasajerosPorVehiculo(patente) {
+      try {
+        const response = await fetch(`${API_URL}/pasajeros`);
+        if (!response.ok) {
+          throw new Error('Error al obtener pasajeros');
+        }
+
+        const pasajeros = await response.json();
+
+        // Filtrar pasajeros por la patente del vehículo
+        const pasajerosFiltrados = pasajeros.filter(p => {
+          const patenteAsig = typeof p.vehiculoasignado === 'object'
+            ? p.vehiculoasignado?.patente?.trim()
+            : p.vehiculoasignado?.trim();
+          return patenteAsig === patente;
+        });
+
+        // Geocodificar direcciones de pasajeros que no tienen coordenadas
+        const pasajerosConCoordenadas = await Promise.all(
+          pasajerosFiltrados.map(async (pasajero) => {
+            if (!pasajero.latitud || !pasajero.longitud) {
+              try {
+                const geocoder = new google.maps.Geocoder();
+                const direccionCompleta = `${pasajero.domicilio}, ${pasajero.codigoPostal}, Mendoza, Argentina`;
+
+                return new Promise((resolve) => {
+                  geocoder.geocode({ address: direccionCompleta }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                      const coords = results[0].geometry.location;
+                      pasajero.latitud = coords.lat();
+                      pasajero.longitud = coords.lng();
+                    }
+                    resolve(pasajero);
+                  });
+                });
+              } catch (error) {
+                console.error("Error geocodificando pasajero:", error);
+                return pasajero;
+              }
+            }
+            return pasajero;
+          })
+        );
+
+        return pasajerosConCoordenadas.filter(p => p.latitud && p.longitud);
+      } catch (error) {
+        console.error('Error obteniendo pasajeros:', error);
+        return [];
+      }
+    }
+
+    // Mostrar ruta del conductor
+    async function mostrarRutaConductor(conductor) {
+      try {
+        // Limpiar ruta anterior si existe
+        limpiarRutas();
+
+        const vehiculo = typeof conductor.vehiculo === 'object'
+          ? conductor.vehiculo?.patente
+          : conductor.vehiculo;
+
+        if (!vehiculo) {
+          console.log('Conductor sin vehículo asignado');
+          return;
+        }
+
+        // Obtener pasajeros asignados al vehículo
+        const pasajeros = await obtenerPasajerosPorVehiculo(vehiculo);
+
+        if (pasajeros.length === 0) {
+          console.log('No hay pasajeros asignados a este vehículo');
+          return;
+        }
+
+        // Posición actual del conductor
+        const origenConductor = {
+          lat: parseFloat(conductor.latitud),
+          lng: parseFloat(conductor.longitud)
+        };
+
+        // Destino (empresa)
+        const destino = { lat: -32.962028, lng: -68.718583 };
+
+        // Crear waypoints para los pasajeros
+        const waypoints = pasajeros
+          .filter(p => p.latitud && p.longitud && !isNaN(p.latitud) && !isNaN(p.longitud))
+          .map(p => ({
+            location: { lat: parseFloat(p.latitud), lng: parseFloat(p.longitud) },
+            stopover: true
+          }));
+
+        // Crear marcadores para las paradas
+        const routeMarkers = [];
+
+        // Marcador de destino
+        const destinoMarker = new google.maps.Marker({
+          position: destino,
+          map: map,
+          title: 'Destino: GeoBuild S.A.',
+          icon: {
+            path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+            scale: 8,
+            fillColor: '#FF0000',
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: '#FFFFFF'
+          }
+        });
+        routeMarkers.push(destinoMarker);
+
+        // Marcadores para cada pasajero
+        waypoints.forEach((waypoint, index) => {
+          const pasajero = pasajeros[index];
+          const marker = new google.maps.Marker({
+            position: waypoint.location,
+            map: map,
+            label: {
+              text: (index + 1).toString(),
+              color: 'white'
+            },
+            title: `Parada ${index + 1}: ${pasajero.nombreCompleto}`,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: '#FFA500',
+              fillOpacity: 1,
+              strokeWeight: 2,
+              strokeColor: '#FFFFFF'
+            }
+          });
+
+          // InfoWindow para el pasajero
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="padding: 8px; max-width: 200px;">
+                <h6 style="margin: 0 0 8px 0;">Parada ${index + 1}</h6>
+                <p style="margin: 2px 0; font-size: 13px;"><strong>Pasajero:</strong> ${pasajero.nombreCompleto}</p>
+                <p style="margin: 2px 0; font-size: 13px;"><strong>Dirección:</strong> ${pasajero.domicilio}</p>
+                <p style="margin: 2px 0; font-size: 13px;"><strong>Código Postal:</strong> ${pasajero.codigoPostal}</p>
+              </div>
+            `
+          });
+
+          marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+          });
+
+          routeMarkers.push(marker);
+        });
+
+        // Guardar los marcadores de la ruta
+        routeMarkersMap.set(conductor.dni, routeMarkers);
+
+        // Crear la solicitud de ruta
+        const request = {
+          origin: origenConductor,
+          destination: destino,
+          waypoints: waypoints,
+          travelMode: google.maps.TravelMode.DRIVING,
+          optimizeWaypoints: true
+        };
+
+        // Obtener y mostrar la ruta
+        directionsService.route(request, (result, status) => {
+          if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result);
+
+            // Actualizar el marcador del conductor con información de ruta
+            const marker = markersMap.get(conductor.dni);
+            if (marker && marker.infoWindow) {
+              const ruta = result.routes[0];
+              let distanciaTotal = 0;
+              let tiempoTotal = 0;
+
+              ruta.legs.forEach(leg => {
+                distanciaTotal += leg.distance.value;
+                tiempoTotal += leg.duration.value;
+              });
+
+              const distanciaKm = (distanciaTotal / 1000).toFixed(1);
+              const tiempoHoras = Math.floor(tiempoTotal / 3600);
+              const tiempoMinutos = Math.floor((tiempoTotal % 3600) / 60);
+
+              const ultimaActualizacion = conductor.ultimaActualizacion
+                ? new Date(conductor.ultimaActualizacion).toLocaleString('es-AR')
+                : 'No disponible';
+
+              marker.infoWindow.setContent(`
+                <div style="padding: 8px; max-width: 300px;">
+                  <h6 style="margin: 0 0 8px 0;">${conductor.nombreCompleto}</h6>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>DNI:</strong> ${conductor.dni}</p>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>Vehículo:</strong> ${vehiculo}</p>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>Actualizado:</strong> ${ultimaActualizacion}</p>
+                  <hr style="margin: 8px 0;">
+                  <h6 style="margin: 0 0 4px 0; color: #0d6efd;">Ruta Asignada</h6>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>Paradas:</strong> ${pasajeros.length}</p>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>Distancia:</strong> ${distanciaKm} km</p>
+                  <p style="margin: 2px 0; font-size: 13px;"><strong>Tiempo estimado:</strong> ${tiempoHoras > 0 ? tiempoHoras + ' h ' : ''}${tiempoMinutos} min</p>
+                  <p style="margin: 6px 0 0 0; font-size: 12px; color: green;">🟢 En línea</p>
+                </div>
+              `);
+            }
+
+            currentRouteShowing = conductor.dni;
+            document.getElementById('clearRoutes').style.display = 'inline-block';
+
+            console.log(`Ruta mostrada para conductor ${conductor.nombreCompleto}`);
+          } else {
+            console.error('Error al obtener ruta:', status);
+          }
+        });
+
+      } catch (error) {
+        console.error('Error mostrando ruta del conductor:', error);
+      }
+    }
+
+    // Limpiar rutas del mapa
+    function limpiarRutas() {
+      if (directionsRenderer) {
+        directionsRenderer.setMap(null);
+        directionsRenderer.setMap(map);
+      }
+
+      // Limpiar marcadores de rutas
+      routeMarkersMap.forEach((markers, dni) => {
+        markers.forEach(marker => marker.setMap(null));
+      });
+      routeMarkersMap.clear();
+
+      currentRouteShowing = null;
+      document.getElementById('clearRoutes').style.display = 'none';
     }
 
     // Crear o actualizar marcador en el mapa
@@ -228,14 +478,18 @@
         // Actualizar InfoWindow
         const infoWindow = new google.maps.InfoWindow({
           content: `
-                <div style="padding: 8px; max-width: 250px;">
-                    <h6 style="margin: 0 0 8px 0;">${conductor.nombreCompleto}</h6>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>DNI:</strong> ${conductor.dni}</p>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>Vehículo:</strong> ${vehiculo}</p>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>Actualizado:</strong> ${ultimaActualizacion}</p>
-                    <p style="margin: 6px 0 0 0; font-size: 12px; color: green;">🟢 En línea</p>
-                </div>
-            `
+            <div style="padding: 8px; max-width: 250px;">
+              <h6 style="margin: 0 0 8px 0;">${conductor.nombreCompleto}</h6>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>DNI:</strong> ${conductor.dni}</p>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>Vehículo:</strong> ${vehiculo}</p>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>Actualizado:</strong> ${ultimaActualizacion}</p>
+              <p style="margin: 6px 0 4px 0; font-size: 12px; color: green;">🟢 En línea</p>
+              <button onclick="mostrarRutaConductor(${JSON.stringify(conductor).replace(/"/g, '&quot;')})" 
+                      style="background: #0d6efd; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                Ver ruta asignada
+              </button>
+            </div>
+          `
         });
 
         google.maps.event.clearListeners(marker, 'click');
@@ -262,14 +516,18 @@
 
         const infoWindow = new google.maps.InfoWindow({
           content: `
-                <div style="padding: 8px; max-width: 250px;">
-                    <h6 style="margin: 0 0 8px 0;">${conductor.nombreCompleto}</h6>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>DNI:</strong> ${conductor.dni}</p>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>Vehículo:</strong> ${vehiculo}</p>
-                    <p style="margin: 2px 0; font-size: 13px;"><strong>Actualizado:</strong> ${ultimaActualizacion}</p>
-                    <p style="margin: 6px 0 0 0; font-size: 12px; color: green;">🟢 En línea</p>
-                </div>
-            `
+            <div style="padding: 8px; max-width: 250px;">
+              <h6 style="margin: 0 0 8px 0;">${conductor.nombreCompleto}</h6>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>DNI:</strong> ${conductor.dni}</p>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>Vehículo:</strong> ${vehiculo}</p>
+              <p style="margin: 2px 0; font-size: 13px;"><strong>Actualizado:</strong> ${ultimaActualizacion}</p>
+              <p style="margin: 6px 0 4px 0; font-size: 12px; color: green;">🟢 En línea</p>
+              <button onclick="mostrarRutaConductor(${JSON.stringify(conductor).replace(/"/g, '&quot;')})" 
+                      style="background: #0d6efd; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                Ver ruta asignada
+              </button>
+            </div>
+          `
         });
 
         marker.addListener('click', () => {
@@ -282,32 +540,22 @@
     }
 
     // Remover marcadores inactivos
-    /*function limpiarMarcadoresInactivos(conductoresActivosIds) {
-      markersMap.forEach((marker, conductorId) => {
-        if (!conductoresActivosIds.includes(conductorId)) {
-          marker.setMap(null);
-          markersMap.delete(conductorId);
-
-          // Mostrar notificación
-          mostrarNotificacionDesconexion(marker.getTitle()?.split(' - ')[0] || 'Conductor');
-        }
-      });
-    }*/
-
     function limpiarMarcadoresInactivos(conductoresActivosIds) {
       markersMap.forEach((marker, conductorId) => {
         if (!conductoresActivosIds.includes(conductorId)) {
           marker.setMap(null);
           markersMap.delete(conductorId);
 
-          const nombre = marker.getTitle()?.split(' - ')[0] || 'Conductor';
+          // Si se está mostrando la ruta de este conductor, limpiarla
+          if (currentRouteShowing === conductorId) {
+            limpiarRutas();
+          }
 
-          // Mostrar notificación con motivo
+          const nombre = marker.getTitle()?.split(' - ')[0] || 'Conductor';
           mostrarNotificacionDesconexion(`${nombre} se ha desconectado por inactividad`);
         }
       });
     }
-
 
     // Actualizar lista de conductores
     function actualizarListaConductores(conductores) {
@@ -316,9 +564,9 @@
 
       if (conductores.length === 0) {
         conductorList.innerHTML = `
-            <div style="padding: 10px; text-align: center; color: #666;">
-                No hay conductores activos
-            </div>
+          <div style="padding: 10px; text-align: center; color: #666;">
+            No hay conductores activos
+          </div>
         `;
         return;
       }
@@ -337,16 +585,20 @@
           : '--:--';
 
         listHTML += `
-            <div class="conductor-item" style="padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #dee2e6;" 
-                 onclick="centrarEnConductor('${conductor.dni}')">
-                <div style="font-weight: bold; margin-bottom: 4px;">${conductor.nombreCompleto}</div>
-                <div style="font-size: 12px; color: #6c757d;">
-                    DNI: ${conductor.dni}<br>
-                    Vehículo: ${vehiculo}<br>
-                    Actualizado: ${ultimaActualizacion}
-                </div>
-                <div style="float: right; margin-top: -40px;">🟢</div>
+          <div class="conductor-item" style="padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #dee2e6;" 
+               onclick="centrarEnConductor('${conductor.dni}')">
+            <div style="font-weight: bold; margin-bottom: 4px;">${conductor.nombreCompleto}</div>
+            <div style="font-size: 12px; color: #6c757d;">
+              DNI: ${conductor.dni}<br>
+              Vehículo: ${vehiculo}<br>
+              Actualizado: ${ultimaActualizacion}
             </div>
+            <div style="float: right; margin-top: -40px;">🟢</div>
+            <button onclick="event.stopPropagation(); mostrarRutaConductor(${JSON.stringify(conductor).replace(/"/g, '&quot;')})" 
+                    style="background: #0d6efd; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-top: 4px;">
+              Ver ruta
+            </button>
+          </div>
         `;
       });
 
