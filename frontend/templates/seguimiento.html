@@ -541,7 +541,8 @@
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    compartiendo: false
+                    compartiendo: false,
+                    activo: false
                 })
             }).catch(err => console.error('Error al detener seguimiento:', err));
         }

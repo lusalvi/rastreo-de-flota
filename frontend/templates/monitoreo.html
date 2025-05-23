@@ -165,14 +165,32 @@
         const conductores = await response.json();
 
         // Filtrar solo conductores activos y compartiendo ubicación
-        const activos = conductores.filter(conductor =>
+        /*const activos = conductores.filter(conductor =>
           conductor.activo === true &&
           conductor.compartiendo === true &&
           conductor.latitud &&
           conductor.longitud &&
           !isNaN(parseFloat(conductor.latitud)) &&
           !isNaN(parseFloat(conductor.longitud))
-        );
+        );*/
+
+        const ahora = new Date();
+
+        const activos = conductores.filter(conductor => {
+          const lat = parseFloat(conductor.latitud);
+          const lng = parseFloat(conductor.longitud);
+          const ultima = new Date(conductor.ultimaActualizacion);
+          const diferenciaMin = (ahora - ultima) / 1000 / 60; // minutos
+
+          return (
+            conductor.activo === true &&
+            conductor.compartiendo === true &&
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            diferenciaMin <= 1 // 💡 Si pasó más de 5 minutos, se excluye
+          );
+        });
+
 
         console.log(`Conductores activos: ${activos.length}`);
         return activos;
@@ -264,14 +282,32 @@
     }
 
     // Remover marcadores inactivos
+    /*function limpiarMarcadoresInactivos(conductoresActivosIds) {
+      markersMap.forEach((marker, conductorId) => {
+        if (!conductoresActivosIds.includes(conductorId)) {
+          marker.setMap(null);
+          markersMap.delete(conductorId);
+
+          // Mostrar notificación
+          mostrarNotificacionDesconexion(marker.getTitle()?.split(' - ')[0] || 'Conductor');
+        }
+      });
+    }*/
+
     function limpiarMarcadoresInactivos(conductoresActivosIds) {
       markersMap.forEach((marker, conductorId) => {
         if (!conductoresActivosIds.includes(conductorId)) {
           marker.setMap(null);
           markersMap.delete(conductorId);
+
+          const nombre = marker.getTitle()?.split(' - ')[0] || 'Conductor';
+
+          // Mostrar notificación con motivo
+          mostrarNotificacionDesconexion(`${nombre} se ha desconectado por inactividad`);
         }
       });
     }
+
 
     // Actualizar lista de conductores
     function actualizarListaConductores(conductores) {
@@ -315,6 +351,18 @@
       });
 
       conductorList.innerHTML = listHTML;
+    }
+
+    function mostrarNotificacionDesconexion(mensaje) {
+      const notificacion = document.getElementById('notificacionDesconexion');
+      if (!notificacion) return;
+
+      notificacion.textContent = `🔴 ${mensaje}`;
+      notificacion.style.display = 'block';
+
+      setTimeout(() => {
+        notificacion.style.display = 'none';
+      }, 4000);
     }
 
     // Centrar mapa en conductor
@@ -479,7 +527,13 @@
         clearInterval(updateInterval);
       }
     });
+
   </script>
+
+  <div id="notificacionDesconexion"
+    style="position: fixed; bottom: 20px; right: 20px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px 16px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: none; z-index: 9999;">
+    🔴 Conductor desconectado
+  </div>
 
   <script src="../js/bootstrap.js"></script>
 </body>
