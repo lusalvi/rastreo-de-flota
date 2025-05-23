@@ -42,8 +42,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('Faltan variables de entorno para Supabase');
-    process.exit(1);
+  console.error('Faltan variables de entorno para Supabase');
+  process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -95,7 +95,7 @@ app.get('/api/conductores/activo', async (req, res) => {
     const conductoresConUbicacion = await Promise.all(
       conductores.map(async (conductor) => {
         const { data: ubicaciones, error: errorUbicacion } = await supabase
-          .from('ubicacion')
+          .from('ubicaciones') 
           .select('latitud, longitud, timestamp')
           .eq('dni', conductor.dni)
           .order('timestamp', { ascending: false })
@@ -133,7 +133,7 @@ app.get('/api/conductores/buscar', async (req, res) => {
       .select('*, vehiculo(patente)')
       .ilike('nombreCompleto', `%${q}%`)
       .or(`dni.ilike.%${q}%`);
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -150,7 +150,7 @@ app.get('/api/conductores/:dni', async (req, res) => {
       .select('*')
       .eq('dni', dni)
       .single();
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -163,7 +163,7 @@ app.post('/api/conductores', async (req, res) => {
     const { error } = await supabase
       .from('conductores')
       .upsert([req.body]);
-    
+
     if (error) throw error;
     res.status(201).json({ message: 'Conductor creado correctamente' });
   } catch (error) {
@@ -178,7 +178,7 @@ app.put('/api/conductores/:dni', async (req, res) => {
       .from('conductores')
       .update(req.body)
       .eq('dni', dni);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Conductor actualizado correctamente' });
   } catch (error) {
@@ -193,7 +193,7 @@ app.delete('/api/conductores/:dni', async (req, res) => {
       .from('conductores')
       .delete()
       .eq('dni', dni);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Conductor eliminado correctamente' });
   } catch (error) {
@@ -207,7 +207,7 @@ app.get('/api/pasajeros', async (req, res) => {
     const { data, error } = await supabase
       .from('pasajeros')
       .select('*, vehiculoasignado(patente)');
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -224,7 +224,7 @@ app.get('/api/pasajeros/buscar', async (req, res) => {
       .select('*, vehiculoasignado(patente)')
       .ilike('nombreCompleto', `%${q}%`)
       .or(`dni.ilike.%${q}%`);
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -241,7 +241,7 @@ app.get('/api/pasajeros/:dni', async (req, res) => {
       .select('*')
       .eq('dni', dni)
       .single();
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -254,7 +254,7 @@ app.post('/api/pasajeros', async (req, res) => {
     const { error } = await supabase
       .from('pasajeros')
       .upsert([req.body]);
-    
+
     if (error) throw error;
     res.status(201).json({ message: 'Pasajero creado correctamente' });
   } catch (error) {
@@ -269,7 +269,7 @@ app.put('/api/pasajeros/:dni', async (req, res) => {
       .from('pasajeros')
       .update(req.body)
       .eq('dni', dni);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Pasajero actualizado correctamente' });
   } catch (error) {
@@ -284,7 +284,7 @@ app.delete('/api/pasajeros/:dni', async (req, res) => {
       .from('pasajeros')
       .delete()
       .eq('dni', dni);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Pasajero eliminado correctamente' });
   } catch (error) {
@@ -298,7 +298,7 @@ app.get('/api/vehiculos', async (req, res) => {
     const { data, error } = await supabase
       .from('vehiculos')
       .select('*, conductores(dni)');
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -316,7 +316,7 @@ app.get('/api/vehiculos/buscar', async (req, res) => {
       .ilike('patente', `%${q}%`)
       .or(`marca.ilike.%${q}%`)
       .or(`modelo.ilike.%${q}%`);
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -330,7 +330,7 @@ app.get('/api/vehiculos/patentes', async (req, res) => {
     const { data, error } = await supabase
       .from('vehiculos')
       .select('patente, marca');
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -347,7 +347,7 @@ app.get('/api/vehiculos/:patente', async (req, res) => {
       .select('*')
       .eq('patente', patente)
       .single();
-    
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (error) {
@@ -360,7 +360,7 @@ app.post('/api/vehiculos', async (req, res) => {
     const { error } = await supabase
       .from('vehiculos')
       .upsert([req.body]);
-    
+
     if (error) throw error;
     res.status(201).json({ message: 'Vehículo creado correctamente' });
   } catch (error) {
@@ -375,7 +375,7 @@ app.put('/api/vehiculos/:patente', async (req, res) => {
       .from('vehiculos')
       .update(req.body)
       .eq('patente', patente);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Vehículo actualizado correctamente' });
   } catch (error) {
@@ -390,7 +390,7 @@ app.delete('/api/vehiculos/:patente', async (req, res) => {
       .from('vehiculos')
       .delete()
       .eq('patente', patente);
-    
+
     if (error) throw error;
     res.status(200).json({ message: 'Vehículo eliminado correctamente' });
   } catch (error) {

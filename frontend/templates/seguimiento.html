@@ -35,32 +35,32 @@
             margin-bottom: 15px;
         }
 
-         .card {
+        .card {
             color: white;
-        } 
+        }
 
         @media (max-width: 768px) {
             #map {
                 height: 400px;
             }
         }
+
         .card {
-        background-color: #A89F91 !important;
-        color: black !important;
-        border: none;
+            background-color: #A89F91 !important;
+            color: black !important;
+            border: none;
         }
 
         .card-header {
-        background-color: #A89F91 !important;
-        color: black !important;
-        border-bottom: 1px solid #ccc;
+            background-color: #A89F91 !important;
+            color: black !important;
+            border-bottom: 1px solid #ccc;
         }
 
         .card-body {
-        background-color: #A89F91 !important;
-        color: black !important;
-}
-        
+            background-color: #A89F91 !important;
+            color: black !important;
+        }
     </style>
 </head>
 
@@ -423,10 +423,10 @@
                 }
 
                 // Si la precisión es muy mala, no actualizar la posición
-               /*  if (posicion.coords.accuracy > 100) {
-                    console.log("Precisión demasiado mala para actualizar posición:", posicion.coords.accuracy);
-                    return;
-                } */
+                /*  if (posicion.coords.accuracy > 100) {
+                     console.log("Precisión demasiado mala para actualizar posición:", posicion.coords.accuracy);
+                     return;
+                 } */
             }
 
             // Continuar con la actualización si la precisión es aceptable
@@ -476,7 +476,30 @@
             });
 
             // Enviar la ubicación al backend
-            enviarUbicacion(lat, lng);
+            const dni = new URLSearchParams(window.location.search).get('dni');
+            const timestamp = new Date().toISOString();
+
+            fetch(`${API_URL}/ubicacion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dni,
+                    latitud: lat,
+                    longitud: lng,
+                    timestamp
+                })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error(`Error al guardar ubicación: ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log(`✅ Ubicación enviada correctamente: ${lat}, ${lng}`);
+                })
+                .catch(error => {
+                    console.error('❌ Error enviando ubicación:', error);
+                });
+
         }
 
         //PROBAR

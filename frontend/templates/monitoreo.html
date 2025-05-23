@@ -157,7 +157,7 @@
     // Obtener conductores activos desde la API
     async function obtenerConductoresActivos() {
       try {
-        const response = await fetch(`${API_URL}/conductores`);
+        const response = await fetch(`${API_URL}/conductores/activo`);
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
         }
