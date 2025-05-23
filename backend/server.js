@@ -69,16 +69,47 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Conductores
 app.get('/api/conductores', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    // Traer todos los conductores activos y compartiendo
+    const { data: conductores, error: errorConductores } = await supabase
       .from('conductores')
-      .select('*, vehiculo(patente)');
-    
-    if (error) throw error;
-    res.status(200).json(data);
+      .select('*, vehiculo(patente)')
+      .eq('activo', true)
+      .eq('compartiendo', true);
+
+    if (errorConductores) throw errorConductores;
+
+    // Para cada conductor, buscar su última ubicación
+    const conductoresConUbicacion = await Promise.all(
+      conductores.map(async (conductor) => {
+        const { data: ubicaciones, error: errorUbicacion } = await supabase
+          .from('ubicacion')
+          .select('latitud, longitud, timestamp')
+          .eq('dni', conductor.dni)
+          .order('timestamp', { ascending: false })
+          .limit(1);
+
+        if (errorUbicacion) {
+          console.error(`Error ubicando a ${conductor.dni}:`, errorUbicacion);
+          return conductor;
+        }
+
+        if (ubicaciones && ubicaciones.length > 0) {
+          conductor.latitud = ubicaciones[0].latitud;
+          conductor.longitud = ubicaciones[0].longitud;
+          conductor.ultimaActualizacion = ubicaciones[0].timestamp;
+        }
+
+        return conductor;
+      })
+    );
+
+    res.status(200).json(conductoresConUbicacion);
   } catch (error) {
+    console.error('Error en /api/conductores:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Búsqueda de conductores
 app.get('/api/conductores/buscar', async (req, res) => {

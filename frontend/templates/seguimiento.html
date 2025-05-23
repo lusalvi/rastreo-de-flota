@@ -7,8 +7,8 @@
     <title>Seguimiento de Ruta - GeoBuild S.A.</title>
     <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/bootstrap.css">
-   <!--  <link rel="stylesheet" href="../css/costume.css">
-    <link rel="stylesheet" href="../css/cruds.css"> -->
+    <link rel="stylesheet" href="../css/costume.css">
+    <link rel="stylesheet" href="../css/cruds.css">
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#004643">
     <style>
@@ -44,7 +44,7 @@
                 height: 400px;
             }
         }
-   /*      .card {
+        .card {
         background-color: #A89F91 !important;
         color: black !important;
         border: none;
@@ -59,7 +59,7 @@
         .card-body {
         background-color: #A89F91 !important;
         color: black !important;
-} */
+}
         
     </style>
 </head>
@@ -423,10 +423,10 @@
                 }
 
                 // Si la precisión es muy mala, no actualizar la posición
-                if (posicion.coords.accuracy > 100) {
+               /*  if (posicion.coords.accuracy > 100) {
                     console.log("Precisión demasiado mala para actualizar posición:", posicion.coords.accuracy);
                     return;
-                }
+                } */
             }
 
             // Continuar con la actualización si la precisión es aceptable
@@ -479,39 +479,7 @@
             enviarUbicacion(lat, lng);
         }
 
-        // Enviar la ubicación al backend
-        /*         async function enviarUbicacion(latitud, longitud) {
-                    try {
-                        const timestamp = new Date().toISOString();
-                        await fetch(`${API_URL}/ubicacion`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                dni: dni,
-                                latitud: latitud,
-                                longitud: longitud,
-                                timestamp: timestamp
-                            })
-                        });
-        
-                        // También actualizar el documento del conductor con la última ubicación
-                        await fetch(`${API_URL}/conductores/${dni}`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                latitud: latitud,
-                                longitud: longitud,
-                                ultimaActualizacion: timestamp
-                            })
-                        });
-                    } catch (err) {
-                        console.error('Error enviando ubicación:', err);
-                    }
-                } */
-
         //PROBAR
-
-
         async function enviarUbicacion(latitud, longitud) {
             try {
                 const timestamp = new Date().toISOString();
@@ -528,25 +496,10 @@
                     })
                 });
 
-                // ACTUALIZAR datos del conductor en la base
-                await fetch(`${API_URL}/conductores/${dni}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        latitud: latitud,
-                        longitud: longitud,
-                        ultimaActualizacion: timestamp,
-                        activo: true,
-                        compartiendo: true
-                    })
-                });
             } catch (err) {
                 console.error('Error enviando ubicación:', err);
             }
         }
-
-
-
 
         // Detener seguimiento de ubicación
         function detenerSeguimiento() {
