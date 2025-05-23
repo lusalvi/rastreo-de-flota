@@ -113,7 +113,15 @@
           <div class="modal-body">
             <div class="form-group mb-2">
               <label for="dni">DNI:</label>
-              <input type="text" id="dni" name="dni" class="form-control" required>
+              <input 
+                  type="text" 
+                  id="dni" 
+                  name="dni" 
+                  class="form-control" 
+                  required 
+                  pattern="\d{8}" 
+                  maxlength="8" 
+                  title="El DNI debe tener exactamente 8 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="nombreCompleto">Nombre Completo:</label>
@@ -125,7 +133,15 @@
             </div>            
             <div class="form-group mb-2">
               <label for="codigoPostal">Código Postal:</label>
-              <input type="text" id="codigoPostal" name="codigoPostal" class="form-control" required>
+                <input 
+                 type="text" 
+                 id="codigoPostal" 
+                 name="codigoPostal" 
+                 class="form-control" 
+                 required 
+                 pattern="\d{4}" 
+                 maxlength="4" 
+                title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="domicilio">Domicilio:</label>
@@ -165,7 +181,15 @@
           <div class="modal-body">
             <div class="form-group mb-2">
               <label for="dni">DNI:</label>
-              <input type="text" id="dni" name="dni" class="form-control" required>
+             <input 
+              type="text" 
+              id="dni" 
+              name="dni" 
+              class="form-control" 
+              required 
+              pattern="\d{8}" 
+              maxlength="8" 
+              title="El DNI debe tener exactamente 8 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="nombreCompleto">Nombre Completo:</label>
@@ -173,7 +197,15 @@
             </div>
             <div class="form-group mb-2">
               <label for="codigoPostal">Código Postal:</label>
-              <input type="text" id="codigoPostal" name="codigoPostal" class="form-control" required>
+             <input 
+                 type="text" 
+                 id="codigoPostal" 
+                 name="codigoPostal" 
+                 class="form-control" 
+                 required 
+                 pattern="\d{4}" 
+                 maxlength="4" 
+                title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="domicilio">Domicilio:</label>
@@ -199,6 +231,16 @@
       <p class="creditos">&copy; 2025 Desarrollo de Software, ITU-UNCUYO</p>
     </div>
   </footer>
+
+ <script>
+  // Solo números en campos de DNI y Código Postal
+  document.querySelectorAll('input[name="dni"], input[name="codigoPostal"]').forEach(input => {
+    input.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '');
+    });
+  });
+</script>
+
 
   <script src="../js/bootstrap.js"></script>
 </body>
