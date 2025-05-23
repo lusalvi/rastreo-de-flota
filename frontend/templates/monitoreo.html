@@ -118,10 +118,18 @@
   </div>
 
   <!-- Notificación -->
-  <div id="notificacionDesconexion"
-    style="position: fixed; bottom: 20px; right: 20px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px 16px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: none; z-index: 9999;">
-    🔴 Conductor desconectado
-  </div>
+
+
+<div id="notificacionDesconexion"
+  style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+         background: #fff3cd; color: #856404; border: 2px solid #856404;
+         padding: 30px 50px; border-radius: 12px;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+         font-size: 24px; font-weight: bold; text-align: center;
+         display: none; z-index: 9999;">
+  🔴 Conductor desconectado
+</div>
+
 
   <!-- Script principal -->
   <script>
@@ -198,14 +206,14 @@
           const lat = parseFloat(conductor.latitud);
           const lng = parseFloat(conductor.longitud);
           const ultima = new Date(conductor.ultimaActualizacion);
-          const diferenciaMin = (ahora - ultima) / 1000 / 60;
+          const diferenciaMin = (ahora - ultima) / 1000;
 
           return (
             conductor.activo === true &&
             conductor.compartiendo === true &&
             !isNaN(lat) &&
             !isNaN(lng) &&
-            diferenciaMin <= 1
+            diferenciaMin <= 15
           );
         });
 
@@ -873,11 +881,6 @@
     });
 
   </script>
-
-  <div id="notificacionDesconexion"
-    style="position: fixed; bottom: 20px; right: 20px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px 16px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: none; z-index: 9999;">
-    🔴 Conductor desconectado
-  </div>
 
   <script src="../js/bootstrap.js"></script>
 </body>
