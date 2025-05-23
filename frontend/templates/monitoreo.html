@@ -151,6 +151,8 @@
         gestureHandling: 'greedy'
       });
 
+      crearMarcadorEmpresa();
+
       // Inicializar servicios de direcciones
       directionsService = new google.maps.DirectionsService();
       directionsRenderer = new google.maps.DirectionsRenderer({
@@ -266,6 +268,87 @@
         return [];
       }
     }
+
+    // Función para crear el marcador fijo de la empresa
+    function crearMarcadorEmpresa() {
+      // Coordenadas de la empresa GeoBuild S.A.
+      const empresaPosition = { lat: -32.962028, lng: -68.718583 };
+
+      // Crear el marcador de la empresa
+      const empresaMarker = new google.maps.Marker({
+        position: empresaPosition,
+        map: map,
+        title: 'GeoBuild S.A. - Sede Principal',
+        icon: {
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          scale: 12,
+          fillColor: '#DC3545', // Rojo corporativo
+          fillOpacity: 1,
+          strokeWeight: 3,
+          strokeColor: '#FFFFFF'
+        },
+        zIndex: 1000 // Para que esté siempre visible encima de otros marcadores
+      });
+
+      // Crear InfoWindow para la empresa
+      const empresaInfoWindow = new google.maps.InfoWindow({
+        content: `
+      <div style="padding: 12px; max-width: 280px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+          <img src="../img/iconoSF.png" alt="Logo GeoBuild" style="width: 40px; height: 40px; margin-right: 10px;">
+          <h5 style="margin: 0; color: #DC3545; font-weight: bold;">GeoBuild S.A.</h5>
+        </div>
+        <hr style="margin: 8px 0; border-color: #DC3545;">
+        <p style="margin: 4px 0; font-size: 14px;"><strong>🏢 Sede Principal</strong></p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>📍 Dirección:</strong> Mendoza, Argentina</p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>🕒 Horario:</strong> Lun-Vie 8:00-18:00</p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>📞 Contacto:</strong> +54 261 XXX-XXXX</p>
+        <div style="margin-top: 10px; padding: 6px; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #DC3545;">
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            <strong>Destino final</strong> de todas las rutas de transporte
+          </p>
+        </div>
+      </div>
+    `,
+        pixelOffset: new google.maps.Size(0, -10)
+      });
+
+      // Event listener para mostrar InfoWindow al hacer clic
+      empresaMarker.addListener('click', () => {
+        // Cerrar otros InfoWindows abiertos (opcional)
+        // Puedes comentar estas líneas si quieres que se mantengan abiertos múltiples InfoWindows
+        markersMap.forEach((marker) => {
+          if (marker.infoWindow && marker.infoWindow.close) {
+            marker.infoWindow.close();
+          }
+        });
+
+        // Abrir InfoWindow de la empresa
+        empresaInfoWindow.open(map, empresaMarker);
+
+        // Centrar un poco el mapa en la empresa (opcional)
+        map.panTo(empresaPosition);
+      });
+
+      // Event listener para hover (opcional - mostrar tooltip)
+      empresaMarker.addListener('mouseover', () => {
+        empresaMarker.setTitle('🏢 GeoBuild S.A. - Haz clic para más información');
+      });
+
+      empresaMarker.addListener('mouseout', () => {
+        empresaMarker.setTitle('GeoBuild S.A. - Sede Principal');
+      });
+
+      // Guardar referencia del marcador para uso posterior
+      window.empresaMarker = empresaMarker;
+      window.empresaInfoWindow = empresaInfoWindow;
+
+      console.log('Marcador de empresa creado en:', empresaPosition);
+
+      return empresaMarker;
+    }
+
+
 
     // Mostrar ruta del conductor
     async function mostrarRutaConductor(conductor) {
@@ -435,9 +518,11 @@
 
     // Limpiar rutas del mapa
     function limpiarRutas() {
+      console.log('Limpiando rutas...');
       if (directionsRenderer) {
         directionsRenderer.setMap(null);
         directionsRenderer.setMap(map);
+        directionsRenderer.setDirections({ routes: [] });
       }
 
       // Limpiar marcadores de rutas
@@ -448,6 +533,8 @@
 
       currentRouteShowing = null;
       document.getElementById('clearRoutes').style.display = 'none';
+
+      console.log('Rutas limpiadas');
     }
 
     // Crear o actualizar marcador en el mapa
@@ -721,6 +808,11 @@
       const centerMap = document.getElementById('centerMap');
       if (centerMap) {
         centerMap.addEventListener('click', centrarMapa);
+      }
+
+      const clearRoutes = document.getElementById('clearRoutes');
+      if (clearRoutes) {
+        clearRoutes.addEventListener('click', limpiarRutas);
       }
 
       document.getElementById('refreshData')?.addEventListener('click', function (e) {
