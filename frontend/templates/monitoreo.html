@@ -48,87 +48,90 @@
         </button>
       </div>
     </header>
-  </div>
 
-  <div class="container mb-4">
-    <div class="stats-container">
-      <div class="stat-card">
-        <div class="stat-value" id="conductorCount">0</div>
-        <div class="stat-label">Conductores activos</div>
+
+    <div class="container mb-4">
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" id="conductorCount">0</div>
+          <div class="stat-label">Conductores activos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="currentTime">--:--</div>
+          <div class="stat-label">Hora actual</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" id="currentTime">--:--</div>
-        <div class="stat-label">Hora actual</div>
+
+      <div class="d-flex gap-2 mb-4">
+        <button id="refreshData" class="btn btn-primary" style="background-color:#2E2E32">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+            <path
+              d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+          </svg>
+          Actualizar datos
+        </button>
+        <button id="centerMap" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt"
+            viewBox="0 0 16 16">
+            <path
+              d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z" />
+            <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+          </svg>
+          Centrar mapa
+        </button>
+        <button id="clearRoutes" class="btn btn-warning" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle"
+            viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <path
+              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+          </svg>
+          Limpiar rutas
+        </button>
       </div>
     </div>
 
-    <div class="d-flex gap-2 mb-4">
-      <button id="refreshData" class="btn btn-primary" style="background-color:#2E2E32">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise"
-          viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
-          <path
-            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
-        </svg>
-        Actualizar datos
-      </button>
-      <button id="centerMap" class="btn btn-secondary">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt"
-          viewBox="0 0 16 16">
-          <path
-            d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z" />
-          <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-        </svg>
-        Centrar mapa
-      </button>
-      <button id="clearRoutes" class="btn btn-warning" style="display: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle"
-          viewBox="0 0 16 16">
-          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-          <path
-            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-        </svg>
-        Limpiar rutas
-      </button>
-    </div>
-  </div>
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="conductor-list-container">
+          <h3>Conductores Activos</h3>
+          <input type="text" id="searchConductor" class="form-control" placeholder="Buscar conductor...">
+          <div class="conductor-list" id="conductorList">
+            <!-- Los conductores se cargarán dinámicamente aquí -->
+          </div>
+        </div>
+      </div>
 
-  <div class="main-container">
-    <div class="sidebar">
-      <div class="conductor-list-container">
-        <h3>Conductores Activos</h3>
-        <input type="text" id="searchConductor" class="form-control" placeholder="Buscar conductor...">
-        <div class="conductor-list" id="conductorList">
-          <!-- Los conductores se cargarán dinámicamente aquí -->
+      <div class="container">
+        <div class="map-container">
+          <div id="map"></div>
+          <button id="refreshMap" class="refresh-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+              class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="map-container">
-      <div id="map"></div>
-      <button id="refreshMap" class="refresh-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise"
-          viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
-          <path
-            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
-        </svg>
-      </button>
-    </div>
   </div>
 
   <!-- Notificación -->
 
 
-<div id="notificacionDesconexion"
-  style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  <div id="notificacionDesconexion" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
          background: #fff3cd; color: #856404; border: 2px solid #856404;
          padding: 30px 50px; border-radius: 12px;
          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
          font-size: 24px; font-weight: bold; text-align: center;
          display: none; z-index: 9999;">
-  🔴 Conductor desconectado
-</div>
+    🔴 Conductor desconectado
+  </div>
 
 
   <!-- Script principal -->
@@ -308,9 +311,6 @@
         </div>
         <hr style="margin: 8px 0; border-color: #DC3545;">
         <p style="margin: 4px 0; font-size: 14px;"><strong>🏢 Sede Principal</strong></p>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>📍 Dirección:</strong> Mendoza, Argentina</p>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>🕒 Horario:</strong> Lun-Vie 8:00-18:00</p>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>📞 Contacto:</strong> +54 261 XXX-XXXX</p>
         <div style="margin-top: 10px; padding: 6px; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #DC3545;">
           <p style="margin: 0; font-size: 12px; color: #666;">
             <strong>Destino final</strong> de todas las rutas de transporte
