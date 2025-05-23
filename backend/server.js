@@ -67,7 +67,20 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 }); */
 
 // Conductores
+
 app.get('/api/conductores', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('conductores')
+      .select('*, vehiculo(patente)');
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/conductores/activo', async (req, res) => {
   try {
     // Traer todos los conductores activos y compartiendo
     const { data: conductores, error: errorConductores } = await supabase
