@@ -24,7 +24,7 @@ function verificarAcceso() {
   if (!token || !verificado) {
     sessionStorage.clear();
     localStorage.clear();
-     window.location.replace(`${BASE_PATH}/templates/logueo.html`);
+    window.location.replace(`${BASE_PATH}/templates/logueo.html`);
   }
 }
 
@@ -35,24 +35,25 @@ function iniciarVerificacion(correo) {
   localStorage.setItem("codigo_verificacion", codigo.toString());
   localStorage.setItem("correo_verificacion", correo);
   localStorage.setItem("inicio_sesion_correcto", "true");
-  
+
   console.log("Enviando código de verificación:", codigo);
-  
+
+  // Mostrar modal de verificación
+  const modal = new bootstrap.Modal(document.getElementById('modalVerificacion'));
+  modal.show();
+
   // Enviar email con el código utilizando EmailJS
   emailjs.send("service_nz7d0e3", "template_bgispc8", {
     otp: codigo,
     to_email: correo,
   })
-  .then(() => {
-    console.log("Email enviado correctamente");
-    // Mostrar modal de verificación
-    const modal = new bootstrap.Modal(document.getElementById('modalVerificacion'));
-    modal.show();
-  })
-  .catch(err => {
-    console.error("Error enviando el correo:", err);
-    alert("Error enviando el correo: " + err.text);
-  });
+    .then(() => {
+      console.log("Email enviado correctamente");
+    })
+    .catch(err => {
+      console.error("Error enviando el correo:", err);
+      alert("Error enviando el correo: " + err.text);
+    });
 }
 
 function cerrarSesion() {
@@ -63,41 +64,41 @@ function cerrarSesion() {
 
 // código para el input de 6 dígitos
 
-  const inputs = document.querySelectorAll('.code-input input');
+const inputs = document.querySelectorAll('.code-input input');
 
-  inputs.forEach((input, index) => {
-    input.addEventListener('input', () => {
-      const value = input.value;
-      if (!/^[0-9]$/.test(value)) {
-        input.value = '';
-        return;
-      }
-      if (index < inputs.length - 1) {
-        inputs[index + 1].focus();
-      }
-    });
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Backspace') {
-        if (input.value === '' && index > 0) {
-          inputs[index - 1].focus();
-        }
-      }
-    });
-
-    input.addEventListener('paste', (e) => {
-      e.preventDefault();
-      const paste = e.clipboardData.getData('text').replace(/\D/g, '');
-      [...paste].forEach((char, i) => {
-        if (inputs[i]) {
-          inputs[i].value = char;
-        }
-      });
-      if (inputs[paste.length]) {
-        inputs[paste.length].focus();
-      }
-    });
+inputs.forEach((input, index) => {
+  input.addEventListener('input', () => {
+    const value = input.value;
+    if (!/^[0-9]$/.test(value)) {
+      input.value = '';
+      return;
+    }
+    if (index < inputs.length - 1) {
+      inputs[index + 1].focus();
+    }
   });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace') {
+      if (input.value === '' && index > 0) {
+        inputs[index - 1].focus();
+      }
+    }
+  });
+
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData('text').replace(/\D/g, '');
+    [...paste].forEach((char, i) => {
+      if (inputs[i]) {
+        inputs[i].value = char;
+      }
+    });
+    if (inputs[paste.length]) {
+      inputs[paste.length].focus();
+    }
+  });
+});
 
 // -------------------- FETCH GENERAL --------------------
 async function fetchAPI(endpoint, method = 'GET', data = null) {
@@ -106,21 +107,21 @@ async function fetchAPI(endpoint, method = 'GET', data = null) {
       method,
       headers: { 'Content-Type': 'application/json' }
     };
-    
+
     if (data && (method === 'POST' || method === 'PUT')) {
       options.body = JSON.stringify(data);
     }
-    
+
     console.log(`Enviando ${method} a ${API_URL}/${endpoint}`, options);
-    
+
     const res = await fetch(`${API_URL}/${endpoint}`, options);
-    
+
     if (!res.ok) {
       const errorText = await res.text();
       console.error(`Error en la solicitud: ${res.status} ${res.statusText}`, errorText);
       throw new Error(errorText || `Error ${res.status}: ${res.statusText}`);
     }
-    
+
     const responseData = await res.json();
     console.log(`Respuesta de ${endpoint}:`, responseData);
     return responseData;
@@ -151,14 +152,14 @@ function alertaFechas() {
   document.querySelectorAll('#conductorTableBody tr').forEach(row => {
     const fechaLic = row.cells[4].innerText;
     if (fechaLic === 'No especificada') return;
-    
+
     const partesFecha = fechaLic.split('/');
     if (partesFecha.length !== 3) return;
-    
+
     const fechaLicDate = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
     const hoy = new Date();
     const diferenciaLic = (fechaLicDate - hoy) / (1000 * 60 * 60 * 24);
-    
+
     if (diferenciaLic <= 14 && diferenciaLic > 0) {
       alert(`¡Atención! La licencia del conductor con DNI ${row.cells[0].innerText} vence pronto.`);
     }
@@ -167,14 +168,14 @@ function alertaFechas() {
   document.querySelectorAll('#vehiculoTableBody tr').forEach(row => {
     const fechaRto = row.cells[5].innerText;
     if (fechaRto === 'No especificada') return;
-    
+
     const partesFecha = fechaRto.split('/');
     if (partesFecha.length !== 3) return;
-    
+
     const fechaRtoDate = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
     const hoy = new Date();
     const diferenciaRto = (hoy - fechaRtoDate) / (1000 * 60 * 60 * 24);
-    
+
     if (diferenciaRto >= 715 && diferenciaRto <= 730) {
       alert(`¡Atención! El vehículo con patente ${row.cells[0].innerText} tiene la RTO por vencer (hace casi 2 años).`);
     }
@@ -575,15 +576,34 @@ function setupVerificacionModal() {
     console.warn("No se encontró el botón de verificación");
     return;
   }
-  
+
   btnVerificar.addEventListener('click', () => {
-    const cod = document.getElementById("codigoIngresado").value;
+    const inputs = document.querySelectorAll('.digit');
+    if (!inputs || inputs.length === 0) {
+      alert("No se encontraron campos de código.");
+      return;
+    }
+
+    let codigo = '';
+    inputs.forEach(input => {
+      if (input && input.value) {
+        codigo += input.value;
+      }
+    });
+
+    console.log("Código ingresado:", codigo, "Longitud:", codigo.length);
+
+    if (codigo.length !== 6) {
+      alert("Por favor ingrese el código completo de 6 dígitos.");
+      return;
+    }
+
     const real = localStorage.getItem("codigo_verificacion");
-    console.log("Código ingresado:", cod, "Código real:", real);
-    
-    if (cod === real) {
+    console.log("Código real:", real);
+
+    if (codigo === real) {
       sessionStorage.setItem("verificacion_completa", "true");
-      
+
       const modalEl = document.getElementById('modalVerificacion');
       const modal = bootstrap.Modal.getInstance(modalEl);
       if (modal) {
@@ -594,10 +614,17 @@ function setupVerificacionModal() {
         document.body.classList.remove('modal-open');
         document.querySelector('.modal-backdrop')?.remove();
       }
-      
+
       window.location.href = `${BASE_PATH}/index.html`;
     } else {
       alert("Código incorrecto");
+
+      inputs.forEach(input => {
+        input.value = '';
+      });
+      if (inputs[0]) {
+        inputs[0].focus();
+      }
     }
   });
 }
@@ -605,30 +632,30 @@ function setupVerificacionModal() {
 // Iniciar sesión con Supabase
 async function iniciarSesion(e) {
   if (e) e.preventDefault();
-  
+
   try {
     const correo = document.getElementById("floatingInput").value;
     const contraseña = document.getElementById("floatingPassword").value;
-    
+
     console.log("Iniciando sesión con correo:", correo);
-    
+
     // Validar que los campos no estén vacíos
     if (!correo || !contraseña) {
       alert("Por favor complete todos los campos");
       return;
     }
-    
+
     // Verificar que supabase esté disponible
     if (!window.supabase) {
       console.error("Error: Supabase no está inicializado correctamente");
       alert("Error de autenticación: el servicio no está disponible");
       return;
     }
-    
+
     // Usamos la misma instancia de Supabase que viene del script del HTML
-    const { data, error } = await window.supabase.auth.signInWithPassword({ 
-      email: correo, 
-      password: contraseña 
+    const { data, error } = await window.supabase.auth.signInWithPassword({
+      email: correo,
+      password: contraseña
     });
 
     if (error) {
@@ -636,15 +663,15 @@ async function iniciarSesion(e) {
       alert("Correo o contraseña incorrectos.");
       return;
     }
-    
+
     console.log("Autenticación exitosa:", data);
-    
+
     // Si llegamos aquí, la autenticación fue exitosa
     localStorage.setItem("token", "ok");
-    
+
     // Iniciamos el proceso de verificación por código
     iniciarVerificacion(correo);
-    
+
   } catch (error) {
     console.error("Error general al iniciar sesión:", error);
     alert("Error al iniciar sesión: " + error.message);
@@ -655,47 +682,47 @@ async function iniciarSesion(e) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DOM cargado, inicializando aplicación...");
   console.log("Ruta actual:", window.location.pathname);
-  
+
   verificarAcceso();
   cargarConductores();
   cargarPasajeros();
   cargarPatentesVehiculos();
   cargarVehiculos();
-  
+
   // Inicializar formularios y eventos
   const formularioLogin = document.getElementById('Formulario');
   if (formularioLogin) {
     console.log("Configurando formulario de login");
     formularioLogin.addEventListener('submit', iniciarSesion);
   }
-  
+
   const salirBtn = document.getElementById('salir');
   if (salirBtn) {
     console.log("Configurando botón de salir");
     salirBtn.addEventListener('click', cerrarSesion);
   }
-  
+
   const conductorForm = document.getElementById('conductorForm');
   if (conductorForm) {
     console.log("Configurando formulario de conductor");
     conductorForm.addEventListener('submit', guardarConductor);
   }
-  
+
   const pasajeroForm = document.getElementById('pasajeroForm');
   if (pasajeroForm) {
     console.log("Configurando formulario de pasajero");
     pasajeroForm.addEventListener('submit', guardarPasajero);
   }
-  
+
   const vehiculoForm = document.getElementById('vehiculoForm');
   if (vehiculoForm) {
     console.log("Configurando formulario de vehículo");
     vehiculoForm.addEventListener('submit', guardarVehiculo);
   }
-  
+
   // Configurar modal de verificación
   setupVerificacionModal();
-  
+
   // Cargar datos si estamos en las páginas correspondientes
   const path = window.location.pathname;
   if (path.includes('personal.html') || path.includes('/templates/personal.html')) {
@@ -707,6 +734,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Estamos en la página de vehículos, cargando datos...");
     cargarVehiculos();
   }
-  
+
   console.log("Inicialización completa");
 });
