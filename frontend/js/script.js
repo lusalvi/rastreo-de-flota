@@ -248,6 +248,24 @@ async function guardarConductor(e) {
 
     await fetchAPI(endpoint, method, obj);
 
+    /* if (method === 'POST') {
+      const enlace = `https://sistemaderastreodeflotas.netlify.app/templates/seguimiento.html?dni=${obj.dni}`;
+      emailjs.send("service_nz7d0e3, template_bgispc8", {
+      to_email: obj.email,
+      seguimiento_link: enlace
+    }).then(() => {
+      console.log("Correo de seguimiento enviado a", obj.email);
+    }).catch(err => {
+      console.error("Error enviando correo de seguimiento:", err);
+      alert("No se pudo enviar el correo de seguimiento.");
+    });
+    console.log("Datos que se enviaran a EmailJS: ");
+    console.log({
+      to_email: correo,
+      seguimiento_link: linkPersonalizado
+    })
+  } */
+
     const modalEl = document.getElementById('modalConductor');
     const modal = bootstrap.Modal.getInstance(modalEl);
     if (modal) {
