@@ -450,11 +450,52 @@ async function cargarPatentesVehiculos() {
     }
 }
 
+function limpiarFormulario(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    form.querySelectorAll('input, textarea, select').forEach(campo => {
+        if (campo.type === 'checkbox' || campo.type === 'radio') {
+            campo.checked = false;
+        } else {
+            campo.value = '';
+        }
+    });
+
+    // También eliminamos el atributo de edición por si estaba seteado
+    form.removeAttribute('data-editando-dni');
+    form.removeAttribute('data-editando-patente');
+}
+
+//--------------------------------- INIT ---------------------------------
 document.addEventListener('DOMContentLoaded', () => {
     cargarConductores();
     cargarPasajeros();
     cargarPatentesVehiculos();
     cargarVehiculos();
+
+    // Limpiar formularios al abrir los modales de "nuevo"
+    const btnNuevoConductor = document.getElementById('btnNuevoConductor');
+    if (btnNuevoConductor) {
+        btnNuevoConductor.addEventListener('click', () => {
+            limpiarFormulario('conductorForm');
+        });
+    }
+
+    const btnNuevoPasajero = document.getElementById('btnNuevoPasajero');
+    if (btnNuevoPasajero) {
+        btnNuevoPasajero.addEventListener('click', () => {
+            limpiarFormulario('pasajeroForm');
+        });
+    }
+
+    const btnNuevoVehiculo = document.getElementById('btnNuevoVehiculo');
+    if (btnNuevoVehiculo) {
+        btnNuevoVehiculo.addEventListener('click', () => {
+            limpiarFormulario('vehiculoForm');
+        });
+    }
+
 
     const conductorForm = document.getElementById('conductorForm');
     if (conductorForm) {
@@ -485,3 +526,4 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarVehiculos();
     }
 });
+

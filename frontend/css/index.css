@@ -216,7 +216,9 @@ header h1 {
 
     .status-expired { background-color: #dc3545; }
     .status-warning { background-color: #ffc107; }
-    .status-ok { background-color: #28a745; }
+    .alert-status.status-ok { background-color: #4CAF50;}
+    .alert-status.status-new { background-color: #4CAF50;}
+
 
     .alert-info {
       font-size: 0.95rem;
