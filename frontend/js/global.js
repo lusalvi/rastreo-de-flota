@@ -24,14 +24,14 @@ function verificarAcceso() {
   if (!token || !verificado) {
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace(`${BASE_PATH}/templates/logueo.html`);
+    window.location.replace(`${BASE_PATH}/logueo.html`);
   }
 }
 
 function cerrarSesion() {
   sessionStorage.clear();
   localStorage.clear();
-  window.location.href = `${BASE_PATH}/templates/logueo.html`;
+  window.location.href = `${BASE_PATH}/logueo.html`;
 }
 
 // -------------------- FETCH GENERAL --------------------
