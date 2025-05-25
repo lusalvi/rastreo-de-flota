@@ -1,106 +1,146 @@
-/* Reseteo General */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html{
-    height: 100%;
-}
-
-/* Estilos Importantes */
 body {
-    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #F1ECE7;
-    margin: 0;
-    padding: 0;
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* Barra de navegación */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background: linear-gradient(200deg, #7a5b5a 40%,  #a89f91 100%);
+    padding: 20px 0;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo-img {
+    height: 125px;
+    object-fit: contain;
+}
+
+.nav-item {
     display: flex;
-    flex-direction: column;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Estilos para el header simplificado */
-.header-logo {
-    max-height: 50px;
-}
-
-.dashboard-title {
-    color: #7A5B5A;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-#salir {
-    background-color: #7A5B5A;
-    border: 0;
+    align-items: center;
+    padding: 15px 20px;
     color: white;
     text-decoration: none;
-    padding: 8px 16px;
     transition: all 0.3s ease;
-}
-
-#salir:hover {
-    background-color: #A89F91;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Ajustes responsive */
-@media (max-width: 576px) {
-    .header-logo {
-        max-height: 40px;
-    }
-    
-    #nombreEmpresa {
-        font-size: 0.9rem;
-    }
-    
-    .dashboard-title {
-        font-size: 1.1rem;
-    }
-    
-    #salir {
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
-    
-    #salir i {
-        margin-right: 0 !important;
-    }
-    
-    #salir span {
-        display: none;
-    }
-}
-/* Dashboard Container */
-.dashboard-container {
-    padding: 20px 0;
-}
-
-/* Welcome Banner */
-.welcome-banner {
-    background-color: #fff;
+    border-left: 3px solid transparent;
+    margin: 10px;
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
 }
 
-.welcome-banner h2 {
-    color: #2E2E32;
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: white;
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: white;
+}
+
+.nav-item i {
+    width: 20px;
+    margin-right: 15px !important;
+    font-size: 16px;
+}
+
+.nav-item span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Contenido principal */
+.main-content {
+    margin-left: 250px;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Header */
+header {
+    background: white;
+    padding: 20px 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 28px;
     font-weight: 600;
+    color: #333;
+    margin: 0;
 }
 
-#userName {
-    color: #7A5B5A;
+/* Boton para cerrar sesión */
+.logout-btn {
+    background-color: #7a5b5a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-#lastLogin, #currentDate {
-    color: #5C565D;
+.logout-btn:hover {
+    background-color: #6a4b4a;
+    transform: translateY(-1px);
 }
 
-/* Stats Overview */
+/* Content */
+.content {
+    padding: 30px;
+}
+
+/* Welcome Section */
+.welcome-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+}
+
+.welcome-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.last-connection {
+    font-size: 16px;
+    color: #666;
+}
+
+/* KPI Cards */
 .stats-overview .stat-card {
     background-color: #fff;
     border-radius: 10px;
@@ -147,153 +187,38 @@ body {
     margin: 0;
 }
 
-/* Quick Actions */
-.quick-actions-card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
-}
 
-.quick-actions-card .card-header {
-    background-color: #A58C6F;
-    color: white;
-    border-bottom: none;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    padding: 15px 20px;
-}
-
-.quick-actions-card .card-body {
-    padding: 25px;
-}
-
-.action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.action-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    background-color: #F1ECE7;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    color: #2E2E32;
-    text-decoration: none;
-    height: 100%;
-    width: 100%;
-}
-
-.action-button:hover {
-    background-color: #7A5B5A;
-    color: white;
-    transform: translateY(-5px);
-}
-
-.action-icon {
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 50%;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 60px;
-    height: 60px;
-    font-size: 1.5rem;
-}
-
-.action-button:hover .action-icon {
-    background-color: rgba(255,255,255,0.9);
-    color: #7A5B5A;
-}
-
-
-/* Estilos para centrar las cards de estadísticas */
-.stats-overview {
-    justify-content: center;
-}
-
-/* Aseguramos que las cards de acciones rápidas estén centradas */
-.action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* Ajustes adicionales para mejorar el espaciado */
-.action-buttons .col-md-3 {
-    display: flex;
-    justify-content: center;
-}
-
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 768px) {
-    .stats-overview .col-md-3 {
-        display: flex;
-        justify-content: center;
+/* Cards de Alertas */
+.row.g-4 > div .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
-    
-    .stats-overview .stat-card {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .action-buttons .col-md-3 {
-        width: 100%;
-        max-width: 300px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
 
-/* Mejora para el contenedor de la hora actual */
-#horaActual {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    letter-spacing: 1px;
-    animation: pulseEffect 2s infinite;
-}
-
-/* Animación sutil para la hora */
-@keyframes pulseEffect {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-}
-
-/* Footer */
-footer {
-    margin-top: auto;
-    background-color: #f9f9f9;
-}
-
-.creditos {
-    margin-bottom: 0;
-    color: #2E2E32;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .action-buttons .col-md-3 {
-        margin-bottom: 15px;
+    .card h5 {
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
-}
 
-@media (max-width: 768px) {
-    .welcome-banner .text-end {
-        text-align: left !important;
-        margin-top: 10px;
+    .alert-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
-    
-    .header {
-        flex-direction: column;
+
+    .alert-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
     }
-    
-    .navbar-brand {
-        margin-bottom: 15px;
+
+    .status-expired { background-color: #dc3545; }
+    .status-warning { background-color: #ffc107; }
+    .status-ok { background-color: #28a745; }
+
+    .alert-info {
+      font-size: 0.95rem;
+      color: #2e2e32;
     }
-}

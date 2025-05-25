@@ -10,7 +10,8 @@
   <!-- FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <!-- Font Awesome para los iconos -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <!-- ICON DE LA PÁGINA -->
   <link rel="shortcut icon" href="img/iconoSF.png" type="image/x-icon">
   <title>Sistema de Rastreo de Flotas</title>
@@ -18,208 +19,109 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Font Awesome para los iconos -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </head>
 
 <body>
-  <!-- Header con Navbar mejorado -->
-  <div class="container">
-    <header class="py-3 mb-4 border-bottom">
-      <div class="row align-items-center">
-        <!-- Logo y nombre de empresa -->
-        <div class="col-8 col-md-6">
-          <div class="d-flex align-items-center">
-            <img src="img/iconoSF.png" class="img-fluid header-logo">
-            <div class="ml-3">
-              <h2 class="mt-1 mb-0 dashboard-title">Dashboard de Control</h2>
-            </div>
-          </div>
-        </div>
+  <!-- Barra de Navegación al costado -->
+  <div class="sidebar">
+    <div class="logo">
+      <img class="logo-img" src="img/iconoSF.png" alt="Logo de GeoBuild">
+    </div>
 
-        <!-- Botón de cerrar sesión -->
-        <div class="col-4 col-md-6 text-right">
-          <a href="templates/logueo.html" class="btn btn-primary" id="salir">
-            <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-          </a>
-        </div>
-      </div>
+    <a href="index.html" class="nav-item active" aria-label="Dashboard">
+      <i class="fa-solid fa-gauge"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="templates/personal.html" class="nav-item" aria-label="Personal">
+      <i class="fas fa-users"></i>
+      <span>Personal</span>
+    </a>
+
+    <a href="templates/vehiculos.html" class="nav-item" aria-label="Vehículos">
+      <i class="fas fa-car"></i>
+      <span>Vehículos</span>
+    </a>
+
+    <a href="templates/monitoreo.html" class="nav-item" aria-label="Monitoreo">
+      <i class="fa-solid fa-map-location-dot"></i>
+      <span>Monitoreo</span>
+    </a>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <header>
+      <h1>Dashboard</h1>
+      <button class="logout-btn" id="CerrarSesion">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
     </header>
-  </div>
 
-  <!-- Dashboard Overview -->
-  <div class="container dashboard-container">
-    <!-- Welcome Banner with Actual Data -->
-    <div class="welcome-banner">
-      <div class="row align-items-center mb-4">
-        <div class="col-md-8">
-          <h2 class="mb-0">Bienvenido, <span id="userName">Supervisor</span></h2>
-          <p class="text-muted">Última conexión: <span id="lastLogin">20 Mayo, 2025 - 09:45</span></p>
-        </div>
-        <div class="col-md-4 text-right">
-          <span id="currentDate" class="fs-5">20 de Mayo, 2025</span>
-        </div>
+    <!-- Contenido -->
+    <div class="content">
+      <div class="welcome-section">
+        <div class="welcome-title">Bienvenido, Supervisor</div>
+        <div class="last-connection">Última conexión: <span id="ultimaConexion"></span></div>
       </div>
-    </div>
 
-    <!-- Stats Overview - Centradas -->
-    <div class="row stats-overview mb-4 justify-content-center">
-      <div class="col-md-4 col-sm-6 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-truck"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value" id="vehiculosRegistrados">--</h3>
-            <p class="stat-label">Vehículos<br>Registrados</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value" id="conductoresRegistrados">--</h3>
-            <p class="stat-label">Conductores<br>Registrados</p>
+      <!-- KPIs -->
+      <div class="row stats-overview mb-4 justify-content-center">
+        <div class="col-md-4 col-sm-6 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value" id="vehiculosRegistrados">--</h3>
+              <p class="stat-label">Vehículos<br>Registrados</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-4 col-sm-6 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value" id="pasajerosRegistrados">--</h3>
-            <p class="stat-label">Pasajeros<br>Registrados</p>
+        <div class="col-md-4 col-sm-6 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value" id="conductoresRegistrados">--</h3>
+              <p class="stat-label">Conductores<br>Registrados</p>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-
-    <!-- Quick Actions Row - Centradas -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card quick-actions-card">
-          <div class="card-header">
-            <h5 class="card-title">Acciones Rápidas</h5>
-          </div>
-          <div class="card-body">
-            <div class="row action-buttons justify-content-center">
-              <div class="col-md-4 col-sm-12 mb-3">
-                <a href="templates/personal.html" class="action-button">
-                  <div class="action-icon">
-                    <i class="fas fa-user-plus"></i>
-                  </div>
-                  <span>Gestionar Personal</span>
-                </a>
-              </div>
-              <div class="col-md-4 col-sm-12 mb-3">
-                <a href="templates/vehiculos.html" class="action-button">
-                  <div class="action-icon">
-                    <i class="fas fa-truck-loading"></i>
-                  </div>
-                  <span>Gestionar Vehículos</span>
-                </a>
-              </div>
-              <div class="col-md-4 col-sm-12 mb-3">
-                <a href="templates/monitoreo.html" class="action-button">
-                  <div class="action-icon">
-                    <i class="fas fa-map-marked-alt"></i>
-                  </div>
-                  <span>Ver Centro de Monitoreo</span>
-                </a>
-              </div>
+        <div class="col-md-4 col-sm-6 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value" id="pasajerosRegistrados">--</h3>
+              <p class="stat-label">Pasajeros<br>Registrados</p>
             </div>
           </div>
         </div>
       </div>
+
+
+      <!-- Alertas -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card">
+            <h5>Próximos Vencimientos</h5>
+            <div id="vencimientosContainer"></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <h5>Actividad Reciente</h5>
+            <div id="actividadContainer"></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="py-3 my-4 border-top">
-    <div class="container">
-      <p class="creditos text-center">&copy; 2025 Desarrollo de Software, ITU-UNCUYO</p>
-    </div>
-  </footer>
-
-  <!-- Script personalizado -->
-  <script src="js/script.js"></script>
-
-  <!-- Script para la hora actual -->
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      actualizarFechaActual();
-      await cargarEstadisticasDashboard();
-      actualizarUltimaConexion();
-      mostrarDatosUsuario();
-    });
-
-    function actualizarFechaActual() {
-      const fechaActual = new Date();
-      const opcionesFecha = { day: 'numeric', month: 'long', year: 'numeric' };
-      document.getElementById('currentDate').textContent = fechaActual.toLocaleDateString('es-AR', opcionesFecha);
-    }
-
-    async function cargarEstadisticasDashboard() {
-      const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
-
-      try {
-        const [vehiculos, conductores, pasajeros] = await Promise.all([
-          fetch(`${API_URL}/vehiculos`).then(res => res.json()),
-          fetch(`${API_URL}/conductores`).then(res => res.json()),
-          fetch(`${API_URL}/pasajeros`).then(res => res.json())
-        ]);
-
-        document.getElementById('vehiculosRegistrados').textContent = vehiculos.length;
-        document.getElementById('conductoresRegistrados').textContent = conductores.length;
-        document.getElementById('pasajerosRegistrados').textContent = pasajeros.length;
-
-      } catch (error) {
-        console.error('Error al cargar estadísticas del dashboard:', error);
-      }
-    }
-
-    function mostrarDatosUsuario() {
-      const nombre = localStorage.getItem('nombre_usuario');
-      const ultimaConexion = localStorage.getItem('ultima_conexion');
-
-      if (nombre) {
-        document.getElementById('userName').textContent = nombre;
-      }
-
-      if (ultimaConexion) {
-        document.getElementById('lastLogin').textContent = ultimaConexion;
-      }
-    }
-
-    function actualizarUltimaConexion() {
-      const usuarioID = localStorage.getItem('usuario_id');
-      if (!usuarioID) return;
-
-      const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api/supervisores';
-
-      const ahora = new Date().toLocaleString('es-AR');
-      localStorage.setItem('ultima_conexion', ahora);
-
-      fetch(`${API_URL}/${usuarioID}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ultima_conexion: ahora })
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('Fallo al actualizar última conexión');
-        })
-        .catch(err => {
-          console.error('No se pudo actualizar la última conexión del supervisor:', err);
-        });
-    }
-
-  </script>
+<script>
+  
+</script>
 </body>
 
 </html>
