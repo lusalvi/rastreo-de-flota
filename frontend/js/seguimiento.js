@@ -8,6 +8,8 @@ let updateInterval;
 let currentPositionCoords = null;
 let recorridoPolyline = null;  // Nueva variable para el recorrido real
 let recorridoCoordinates = []; // Nueva variable para almacenar las coordenadas del recorrido real
+let modoNavegacionActiva = true;
+
 
 // Registrar el service worker para PWA
 if ('serviceWorker' in navigator) {
@@ -72,6 +74,8 @@ function initMap() {
             strokeOpacity: 0.7
         }
     });
+
+    directionsRenderer.setPanel(document.getElementById('indicaciones'));
 
     // Inicializar la polilínea para el recorrido real
     recorridoPolyline = new google.maps.Polyline({
@@ -326,6 +330,10 @@ function actualizarUbicacion(posicion) {
     // Continuar con la actualización si la precisión es aceptable
     currentPositionCoords = { lat, lng };
 
+    if (modoNavegacionActiva) {
+        map.panTo({ lat, lng }); // Seguir al conductor
+    }
+
     // Agregar punto al recorrido real
     recorridoCoordinates.push(currentPositionCoords);
 
@@ -341,17 +349,18 @@ function actualizarUbicacion(posicion) {
             position: { lat, lng },
             map: map,
             title: 'Tu ubicación actual',
-            zIndex: 999, // Para que aparezca por encima de otros marcadores
-            animation: google.maps.Animation.DROP,
+            zIndex: 999,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 8,
-                fillColor: "#4285F4",
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 6,
+                fillColor: '#4285F4',
                 fillOpacity: 1,
                 strokeWeight: 2,
-                strokeColor: "#FFFFFF"
+                strokeColor: '#FFFFFF',
+                rotation: 0 // fijo, sin rotación
             }
         });
+
     }
 
     // Centrar el mapa en la posición actual si es la primera vez
@@ -492,14 +501,17 @@ async function main() {
                     title: 'Tu ubicación',
                     zIndex: 999,
                     icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 8,
-                        fillColor: "#4285F4",
+                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                        scale: 6,
+                        fillColor: '#4285F4',
                         fillOpacity: 1,
                         strokeWeight: 2,
-                        strokeColor: "#FFFFFF"
+                        strokeColor: '#FFFFFF',
+                        rotation: 0
                     }
                 });
+
+
 
                 // Si hay pasajeros, trazar la ruta con paradas
                 // Si no, trazar ruta directa a la empresa
@@ -560,4 +572,16 @@ function loadScript() {
 }
 
 // Iniciar la carga de scripts cuando la página esté lista
-window.onload = loadScript;
+// Iniciar la carga de scripts cuando la página esté lista
+window.onload = () => {
+    loadScript();
+
+    // Esperar que el DOM esté cargado para asignar el evento al botón
+    const btn = document.getElementById('btnIniciar');
+    if (btn) {
+        btn.addEventListener('click', () => {
+            main(); // Inicia la lógica completa
+            btn.style.display = 'none'; // Oculta el botón al empezar
+        });
+    }
+};

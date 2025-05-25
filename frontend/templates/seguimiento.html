@@ -8,7 +8,6 @@
     <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/costume.css">
-    <link rel="stylesheet" href="../css/cruds.css">
     <link rel="manifest" href="../manifest.json">
     <script src="../js/seguimiento.js"></script>
     <meta name="theme-color" content="#004643">
@@ -66,19 +65,15 @@
 </head>
 
 <body>
-    <div class="container">
-        <header class="d-flex align-items-center justify-content-between py-3 mb-4 border-bottom">
-            <a href="#" class="navbar-brand d-flex align-items-center">
-                <img src="../img/iconoSF.png" alt="Logo" class="img-fluid" style="max-height: 50px;">
-                <span class="fs-5">GeoBuild S.A.</span>
-            </a>
-        </header>
-    </div>
+    <header class="mb-2">
+        <h1>Rutas del Conductor</h1>
+    </header>
 
     <main class="container">
         <div class="alert alert-info" id="estado">Inicializando seguimiento...</div>
 
         <button id="instalarApp" class="btn btn-primary install-button">Instalar aplicación</button>
+        <button id="btnIniciar" class="btn btn-success mb-3">Iniciar navegación</button>
 
         <div class="conductor-info" id="infoConductor">
             <!-- Aquí se mostrará información del conductor y vehículo -->
