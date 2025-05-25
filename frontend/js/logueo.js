@@ -26,6 +26,43 @@ function iniciarVerificacion(correo) {
         });
 }
 
+// código para el input de 6 dígitos
+const inputs = document.querySelectorAll('.code-input input');
+
+inputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+        const value = input.value;
+        if (!/^[0-9]$/.test(value)) {
+            input.value = '';
+            return;
+        }
+        if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+            if (input.value === '' && index > 0) {
+                inputs[index - 1].focus();
+            }
+        }
+    });
+
+    input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = e.clipboardData.getData('text').replace(/\D/g, '');
+        [...paste].forEach((char, i) => {
+            if (inputs[i]) {
+                inputs[i].value = char;
+            }
+        });
+        if (inputs[paste.length]) {
+            inputs[paste.length].focus();
+        }
+    });
+});
+
 // -------------------- VERIFICACIÓN CÓDIGO --------------------
 function setupVerificacionModal() {
     const btnVerificar = document.getElementById('btnVerificarModal');
@@ -135,9 +172,10 @@ async function iniciarSesion(e) {
     }
 }
 
+// -------------------- INIT --------------------
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('Formulario')?.addEventListener('submit', iniciarSesion);
-
+    console.log("DOM cargado, inicializando aplicación...");
+    console.log("Ruta actual:", window.location.pathname);
 
     // Inicializar formularios y eventos
     const formularioLogin = document.getElementById('Formulario');
@@ -146,12 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formularioLogin.addEventListener('submit', iniciarSesion);
     }
 
-    const salirBtn = document.getElementById('cerrarSesion');
-    if (salirBtn) {
-        console.log("Configurando botón de salir");
-        salirBtn.addEventListener('click', cerrarSesion);
-    }
-
     // Configurar modal de verificación
     setupVerificacionModal();
+
+    console.log("Inicialización de login completa");
 });

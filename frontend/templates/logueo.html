@@ -58,7 +58,8 @@
           <div class="form-floating mb-3 position-relative" id="input">
             <input type="password" class="form-control" id="floatingPassword" placeholder="Contraseña" required>
             <label for="floatingPassword">Contraseña</label>
-              <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" id="togglePassword" style="cursor: pointer;"></i>
+            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" id="togglePassword"
+              style="cursor: pointer;"></i>
           </div>
 
 
@@ -98,19 +99,20 @@
     </div>
   </div>
 
-    <script>
-  document.getElementById('togglePassword').addEventListener('click', function () {
-    const passwordInput = document.getElementById('floatingPassword');
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    this.classList.toggle('bi-eye');
-    this.classList.toggle('bi-eye-slash');
-  });
-</script>
+  <script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('floatingPassword');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('bi-eye');
+      this.classList.toggle('bi-eye-slash');
+    });
+  </script>
 
   <script src="../js/bootstrap.js"></script>
-    <!-- Script principal -->
-  <script src="../js/script.js"></script>
+  <!-- JS -->
+   <script src="../js/global.js"></script>
+   <script src="../js/logueo.js"></script>
 </body>
 
 </html>

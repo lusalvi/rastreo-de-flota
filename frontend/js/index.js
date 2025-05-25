@@ -166,16 +166,6 @@ async function refrescarDashboard() {
 document.addEventListener('DOMContentLoaded', async () => {
   console.log("Inicializando dashboard...");
   
-  // Verificar acceso antes de cargar cualquier cosa
-  verificarAcceso();
-  
-  // Configurar evento del botón cerrar sesión
-  const btnCerrarSesion = document.getElementById('CerrarSesion');
-  if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener('click', cerrarSesion);
-    console.log("Botón de cerrar sesión configurado");
-  }
-
   // Mostrar última conexión
   mostrarUltimaConexion();
 

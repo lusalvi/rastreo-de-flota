@@ -21,18 +21,9 @@
   // Inicializa EmailJS con tu public key
   emailjs.init("Z-9x506U55yhP1flZ"); // Cambialo si tu clave es distinta
 </script> -->
-  <script src="../js/script.js"></script>
+  <script src="../js/global.js"></script>
+  <script src="../js/cruds.js"></script>
 
-  <script>
-    const ruta = window.location.pathname;
-    const esLogin = ruta.includes('logueo.html');
-    const esVerificacion = ruta.includes('verificacion.html');
-    const verificado = sessionStorage.getItem("verificacion_completa") === "true";
-    const sesionIniciada = localStorage.getItem("inicio_sesion_correcto") === "true";
-    if (!esLogin && !esVerificacion && (!verificado || !sesionIniciada)) {
-      window.location.replace("logueo.html");
-    }
-  </script>
 </head>
 
 <body>

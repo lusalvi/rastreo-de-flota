@@ -16,17 +16,8 @@
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
   <title>Gestión Vehicular - GeoBuild S.A.</title>
   <!-- JS -->
-  <script src="../js/script.js"></script>
-  <script>
-    const ruta = window.location.pathname;
-    const esLogin = ruta.includes('logueo.html');
-    const esVerificacion = ruta.includes('verificacion.html');
-    const verificado = sessionStorage.getItem("verificacion_completa") === "true";
-    const sesionIniciada = localStorage.getItem("inicio_sesion_correcto") === "true";
-    if (!esLogin && !esVerificacion && (!verificado || !sesionIniciada)) {
-      window.location.replace("logueo.html");
-    }
-  </script>
+  <script src="../js/global.js"></script>
+  <script src="../js/cruds.js"></script>
 </head>
 
 <body>

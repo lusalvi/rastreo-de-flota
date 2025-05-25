@@ -12,16 +12,8 @@
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
   <title>Sistema de Rastreo de Flotas | CENTRO DE MONITOREO</title>
   <!-- SCRIPT -->
-  <script>
-    const ruta = window.location.pathname;
-    const esLogin = ruta.includes('logueo.html');
-    const esVerificacion = ruta.includes('verificacion.html');
-    const verificado = sessionStorage.getItem("verificacion_completa") === "true";
-    const sesionIniciada = localStorage.getItem("inicio_sesion_correcto") === "true";
-    if (!esLogin && !esVerificacion && (!verificado || !sesionIniciada)) {
-      window.location.replace("logueo.html");
-    }
-  </script>
+   <script src="../js/global.js"></script>
+  <script src="../js/monitoreo.js"></script>
 </head>
 
 <body>

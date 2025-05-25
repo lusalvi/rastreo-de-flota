@@ -1,3 +1,50 @@
+// -------------------- VALIDACIONES --------------------
+function validarDNI(dni) {
+    return /^\d{7,}$/.test(dni);
+}
+
+function validarPatente(patente) {
+    return /^[A-Za-z0-9]{1,7}$/.test(patente);
+}
+
+function validarCategoriaLic(cat) {
+    return /^[A-Za-z]{1,2}[0-9]{0,2}$/.test(cat);
+}
+
+function alertaFechas() {
+    document.querySelectorAll('#conductorTableBody tr').forEach(row => {
+        const fechaLic = row.cells[4].innerText;
+        if (fechaLic === 'No especificada') return;
+
+        const partesFecha = fechaLic.split('/');
+        if (partesFecha.length !== 3) return;
+
+        const fechaLicDate = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
+        const hoy = new Date();
+        const diferenciaLic = (fechaLicDate - hoy) / (1000 * 60 * 60 * 24);
+
+        if (diferenciaLic <= 14 && diferenciaLic > 0) {
+            alert(`¡Atención! La licencia del conductor con DNI ${row.cells[0].innerText} vence pronto.`);
+        }
+    });
+
+    document.querySelectorAll('#vehiculoTableBody tr').forEach(row => {
+        const fechaRto = row.cells[5].innerText;
+        if (fechaRto === 'No especificada') return;
+
+        const partesFecha = fechaRto.split('/');
+        if (partesFecha.length !== 3) return;
+
+        const fechaRtoDate = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
+        const hoy = new Date();
+        const diferenciaRto = (hoy - fechaRtoDate) / (1000 * 60 * 60 * 24);
+
+        if (diferenciaRto >= 715 && diferenciaRto <= 730) {
+            alert(`¡Atención! El vehículo con patente ${row.cells[0].innerText} tiene la RTO por vencer (hace casi 2 años).`);
+        }
+    });
+}
+
 // -------------------- CRUD CONDUCTORES --------------------
 async function cargarConductores() {
     try {
@@ -404,7 +451,6 @@ async function cargarPatentesVehiculos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    verificarAcceso();
     cargarConductores();
     cargarPasajeros();
     cargarPatentesVehiculos();
