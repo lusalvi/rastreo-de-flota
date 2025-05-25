@@ -6,9 +6,8 @@ const API_URL = 'https://sistema-de-rastreo-de-flotas.onrender.com/api';
 function getBasePath() {
   const path = window.location.pathname;
   // Si estamos en una ruta que contiene '/frontend', ajustamos la base
-  if (path.includes('/frontend/')) {
-    return '/frontend';
-  }
+  if (path.includes('/frontend/')) return '/frontend';
+  if (path.includes('/templates/')) return '/templates';
   return '';
 }
 
@@ -84,5 +83,5 @@ document.addEventListener('DOMContentLoaded', () => {
     salirBtn.addEventListener('click', cerrarSesion);
   }
 
-    console.log("Inicialización global completa");
+  console.log("Inicialización global completa");
 });
