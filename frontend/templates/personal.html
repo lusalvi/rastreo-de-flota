@@ -11,12 +11,16 @@
   <!-- FONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <!-- Font Awesome para los iconos -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <!-- ICON DE LA PÁGINA -->
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
-  <title>Sistema de Rastreo de Flotas</title>
+  <title>Sistema de Rastreo de Flotas - Gestión de Personal</title>
   <!-- JS -->
- <!--   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!--   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
    <script>
   // Inicializa EmailJS con tu public key
   emailjs.init("Z-9x506U55yhP1flZ"); // Cambialo si tu clave es distinta
@@ -27,75 +31,91 @@
 </head>
 
 <body>
-  <div class="container">
-    <header
-      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-      <div class="col-md-3 mb-2 mb-md-0">
-        <a href="#" class="navbar-brand d-flex align-items-center">
-          <img src="../img/iconoSF.png" alt="Logo Rastreo de flotas" class="img-fluid" style="max-height: 50px;">
-          <span class="fs-5" id="nombreEmpresa"> GeoBuild S.A. </span>
-        </a>
-      </div>
-      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="../index.html" class="nav-link px-2">Inicio</a></li>
-        <li><a href="personal.html" class="nav-link active px-2">Gestión de Personal</a></li>
-        <li><a href="vehiculos.html" class="nav-link px-2">Gestión Vehicular</a></li>
-        <li><a href="monitoreo.html" class="nav-link px-2">Centro de Monitoreo</a></li>
-      </ul>
-      <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-primary" id="salir">Cerrar Sesión</button>
-      </div>
-    </header>
+  <!-- Barra de Navegación al costado -->
+  <div class="sidebar">
+    <div class="logo">
+      <img class="logo-img" src="../img/iconoSF.png" alt="Logo de GeoBuild">
+    </div>
+
+    <a href="../index.html" class="nav-item" aria-label="Dashboard">
+      <i class="fa-solid fa-gauge"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="personal.html" class="nav-item active" aria-label="Personal">
+      <i class="fas fa-users"></i>
+      <span>Personal</span>
+    </a>
+
+    <a href="vehiculos.html" class="nav-item" aria-label="Vehículos">
+      <i class="fas fa-car"></i>
+      <span>Vehículos</span>
+    </a>
+
+    <a href="monitoreo.html" class="nav-item" aria-label="Monitoreo">
+      <i class="fa-solid fa-map-location-dot"></i>
+      <span>Monitoreo</span>
+    </a>
   </div>
-  <hr>
 
-  <main class="container">
-    <div class="card">
-      <div class="actions">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalConductor">
-          Agregar Conductor
-        </button>
+
+  <main class="main-content">
+    <header>
+      <h1>Gestión de Personal</h1>
+      <button class="logout-btn" id="CerrarSesion">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <div class="actions">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalConductor">
+            Agregar Conductor
+          </button>
+        </div>
+        <h2>Conductores Registrados:</h2>
+        <table id="conductorTable">
+          <thead>
+            <tr>
+              <th>DNI</th>
+              <th>Nombre Completo</th>
+              <th>Email</th>
+              <th>Código Postal</th>
+              <th>Domicilio</th>
+              <th>Fecha de vto Licencia</th>
+              <th>Categoría Licencia</th>
+              <th>Vehículos Asignado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="conductorTableBody"></tbody>
+        </table>
       </div>
-      <h2>Conductores Registrados:</h2>
-      <table id="conductorTable">
-        <thead>
-          <tr>
-            <th>DNI</th>
-            <th>Nombre Completo</th>
-            <th>Email</th>
-            <th>Código Postal</th>
-            <th>Domicilio</th>
-            <th>Fecha de vto Licencia</th>
-            <th>Categoría Licencia</th>
-            <th>Vehículos Asignado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="conductorTableBody"></tbody>
-      </table>
+
+      <div class="card mt-5">
+        <div class="actions">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPasajero">
+            Agregar Pasajero
+          </button>
+        </div>
+        <h2>Pasajeros Registrados:</h2>
+        <table id="pasajeroTable">
+          <thead>
+            <tr>
+              <th>DNI</th>
+              <th>Nombre Completo</th>
+              <th>Código Postal</th>
+              <th>Domicilio</th>
+              <th>Vehículo Asignado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="pasajeroTableBody"></tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="card mt-5">
-      <div class="actions">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPasajero">
-          Agregar Pasajero
-        </button>
-      </div>
-      <h2>Pasajeros Registrados:</h2>
-      <table id="pasajeroTable">
-        <thead>
-          <tr>
-            <th>DNI</th>
-            <th>Nombre Completo</th>
-            <th>Código Postal</th>
-            <th>Domicilio</th>
-            <th>Vehículo Asignado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="pasajeroTableBody"></tbody>
-      </table>
-    </div>
   </main>
 
   <!-- Modales -->
@@ -110,15 +130,8 @@
           <div class="modal-body">
             <div class="form-group mb-2">
               <label for="dni">DNI:</label>
-              <input 
-                  type="text" 
-                  id="dni" 
-                  name="dni" 
-                  class="form-control" 
-                  required 
-                  pattern="\d{8}" 
-                  maxlength="8" 
-                  title="El DNI debe tener exactamente 8 dígitos numéricos.">
+              <input type="text" id="dni" name="dni" class="form-control" required pattern="\d{8}" maxlength="8"
+                title="El DNI debe tener exactamente 8 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="nombreCompleto">Nombre Completo:</label>
@@ -126,19 +139,13 @@
             </div>
             <div class="form-group mb-2">
               <label for="email" class="form-label">Correo Electrónico</label>
-              <input type="email" id="email" name="email" class="form-control" placeholder="ejemplo@correo.com" required>
-            </div>            
+              <input type="email" id="email" name="email" class="form-control" placeholder="ejemplo@correo.com"
+                required>
+            </div>
             <div class="form-group mb-2">
               <label for="codigoPostal">Código Postal:</label>
-                <input 
-                 type="text" 
-                 id="codigoPostal" 
-                 name="codigoPostal" 
-                 class="form-control" 
-                 required 
-                 pattern="\d{4}" 
-                 maxlength="4" 
-                title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
+              <input type="text" id="codigoPostal" name="codigoPostal" class="form-control" required pattern="\d{4}"
+                maxlength="4" title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="domicilio">Domicilio:</label>
@@ -178,15 +185,8 @@
           <div class="modal-body">
             <div class="form-group mb-2">
               <label for="dni">DNI:</label>
-             <input 
-              type="text" 
-              id="dni" 
-              name="dni" 
-              class="form-control" 
-              required 
-              pattern="\d{8}" 
-              maxlength="8" 
-              title="El DNI debe tener exactamente 8 dígitos numéricos.">
+              <input type="text" id="dni" name="dni" class="form-control" required pattern="\d{8}" maxlength="8"
+                title="El DNI debe tener exactamente 8 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="nombreCompleto">Nombre Completo:</label>
@@ -194,15 +194,8 @@
             </div>
             <div class="form-group mb-2">
               <label for="codigoPostal">Código Postal:</label>
-             <input 
-                 type="text" 
-                 id="codigoPostal" 
-                 name="codigoPostal" 
-                 class="form-control" 
-                 required 
-                 pattern="\d{4}" 
-                 maxlength="4" 
-                title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
+              <input type="text" id="codigoPostal" name="codigoPostal" class="form-control" required pattern="\d{4}"
+                maxlength="4" title="El Código Postal debe tener exactamente 4 dígitos numéricos.">
             </div>
             <div class="form-group mb-2">
               <label for="domicilio">Domicilio:</label>
@@ -223,20 +216,14 @@
     </div>
   </div>
 
-  <footer class="py-3 my-4 border-top">
-    <div>
-      <p class="creditos">&copy; 2025 Desarrollo de Software, ITU-UNCUYO</p>
-    </div>
-  </footer>
-
- <script>
-  // Solo números en campos de DNI y Código Postal
-  document.querySelectorAll('input[name="dni"], input[name="codigoPostal"]').forEach(input => {
-    input.addEventListener('input', function () {
-      this.value = this.value.replace(/\D/g, '');
+  <script>
+    // Solo números en campos de DNI y Código Postal
+    document.querySelectorAll('input[name="dni"], input[name="codigoPostal"]').forEach(input => {
+      input.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+      });
     });
-  });
-</script>
+  </script>
 
 
   <script src="../js/bootstrap.js"></script>

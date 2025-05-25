@@ -138,10 +138,10 @@
    border: 0px;
  }
 
- .btn:hover,
- button:hover,
- .btn:active,
- button:active {
+ .modal-footer .btn:hover,
+ .modal-footer button:hover,
+.modal-footer .btn:active,
+ .modal-footer button:active {
    background-color: #b3a5a5;
    transition: 0.2s;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);

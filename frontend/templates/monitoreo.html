@@ -8,41 +8,57 @@
   <link rel="stylesheet" href="../css/bootstrap.css">
   <link rel="stylesheet" href="../css/costume.css">
   <link href="../css/monitoreo.css" rel="stylesheet">
-  <!-- ICON -->
+  <!-- Font Awesome para los iconos -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- ICON DE LA PÁGINA -->
   <link rel="shortcut icon" href="../img/iconoSF.png" type="image/x-icon">
-  <title>Sistema de Rastreo de Flotas | CENTRO DE MONITOREO</title>
-  <!-- SCRIPT -->
-   <script src="../js/global.js"></script>
+  <title>Sistema de Rastreo de Flotas - Centro de Monitoreo</title>
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/global.js"></script>
   <script src="../js/monitoreo.js"></script>
 </head>
 
 <body>
-  <div class="container">
-    <header
-      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-      <div class="col-md-3 mb-2 mb-md-0">
-        <a href="#" class="navbar-brand d-flex align-items-center">
-          <img src="../img/iconoSF.png" alt="Logo Rastreo de flotas" class="img-fluid" style="max-height: 50px ;">
-          <span class="fs-5" id="nombreEmpresa"> GeoBuild S.A. </span>
-        </a>
-      </div>
+  <!-- Barra de Navegación al costado -->
+  <div class="sidebar">
+    <div class="logo">
+      <img class="logo-img" src="../img/iconoSF.png" alt="Logo de GeoBuild">
+    </div>
 
-      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="../index.html" class="nav-link px-2">Inicio</a></li>
-        <li><a href="personal.html" class="nav-link px-2">Gestión de Personal</a></li>
-        <li><a href="vehiculos.html" class="nav-link px-2">Gestión Vehicular</a></li>
-        <li><a href="monitoreo.html" class="nav-link active px-2">Centro de Monitoreo</a></li>
-      </ul>
+    <a href="../index.html" class="nav-item" aria-label="Dashboard">
+      <i class="fa-solid fa-gauge"></i>
+      <span>Dashboard</span>
+    </a>
 
-      <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-primary" id="salir">
-          <a href="logueo.html" class="nav-link px-2">Cerrar Sesion</a>
-        </button>
-      </div>
+    <a href="personal.html" class="nav-item" aria-label="Personal">
+      <i class="fas fa-users"></i>
+      <span>Personal</span>
+    </a>
+
+    <a href="vehiculos.html" class="nav-item" aria-label="Vehículos">
+      <i class="fas fa-car"></i>
+      <span>Vehículos</span>
+    </a>
+
+    <a href="monitoreo.html" class="nav-item active" aria-label="Monitoreo">
+      <i class="fa-solid fa-map-location-dot"></i>
+      <span>Monitoreo</span>
+    </a>
+  </div>
+
+  <main class="main-content">
+    <header>
+      <h1>Centro de Monitoreo</h1>
+      <button class="logout-btn" id="CerrarSesion">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
     </header>
 
-
-    <div class="container mb-4">
+    <div class="container-fluid px-4">
+      <!-- Stats Container -->
       <div class="stats-container">
         <div class="stat-card">
           <div class="stat-value" id="conductorCount">0</div>
@@ -54,6 +70,7 @@
         </div>
       </div>
 
+      <!-- Control Buttons -->
       <div class="d-flex gap-2 mb-4">
         <button id="refreshData" class="btn btn-primary" style="background-color:#2E2E32">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -83,39 +100,37 @@
           Limpiar rutas
         </button>
       </div>
-    </div>
 
-    <div class="main-container">
-      <div class="sidebar">
-        <div class="conductor-list-container">
-          <h3>Conductores Activos</h3>
-          <input type="text" id="searchConductor" class="form-control" placeholder="Buscar conductor...">
-          <div class="conductor-list" id="conductorList">
-            <!-- Los conductores se cargarán dinámicamente aquí -->
+      <!-- Main Monitoring Container -->
+      <div class="monitoring-container">
+        <div class="monitoring-sidebar">
+          <div class="conductor-list-container">
+            <h3>Conductores Activos</h3>
+            <input type="text" id="searchConductor" class="form-control" placeholder="Buscar conductor...">
+            <div class="conductor-list" id="conductorList">
+              <!-- Los conductores se cargarán dinámicamente aquí -->
+            </div>
+          </div>
+        </div>
+
+        <div class="monitoring-content">
+          <div class="map-container">
+            <div id="map"></div>
+            <button id="refreshMap" class="refresh-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                <path
+                  d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
-
-      <div class="container">
-        <div class="map-container">
-          <div id="map"></div>
-          <button id="refreshMap" class="refresh-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-              class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
-              <path
-                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
-            </svg>
-          </button>
-        </div>
-      </div>
     </div>
-
-  </div>
+  </main>
 
   <!-- Notificación -->
-
-
   <div id="notificacionDesconexion" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
          background: #fff3cd; color: #856404; border: 2px solid #856404;
          padding: 30px 50px; border-radius: 12px;
@@ -124,8 +139,6 @@
          display: none; z-index: 9999;">
     🔴 Conductor desconectado
   </div>
-
-
 
   <script src="../js/bootstrap.js"></script>
 </body>

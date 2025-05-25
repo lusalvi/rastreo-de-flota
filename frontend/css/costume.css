@@ -1,121 +1,116 @@
-/* Reseteo General */
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-html{
-    height: 100%;
-}
-
-/* Estilos Importantes */
 body {
-    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #F1ECE7;
-    margin: 0;
-    padding: 0;
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* Barra de navegación */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background: linear-gradient(200deg, #7a5b5a 40%,  #a89f91 100%);
+    padding: 20px 0;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo-img {
+    height: 125px;
+    object-fit: contain;
+}
+
+.nav-item {
     display: flex;
-    flex-direction: column;
-    /* font-family: 'Russo One'; */
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    margin: 10px;
+    border-radius: 10px;
 }
 
-/* Verificación */
-.subtitulo{
-    color: #2E2E32;
-}
-
-/* Header */
-.navbar-brand img {
-    max-height: 80px; /* Altura máxima del logo */
-    margin-right: 1rem; /* Separación del menú */
-}
-
-#nombreEmpresa{
-    color: #2E2E32;
-}
-
-#salir{
-    background-color:#7A5B5A;
-    border: 0px;
-}
-
-#salir a{
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
     color: white;
 }
 
-#salir:hover{
-    background-color: #A89F91;
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: white;
 }
 
-.nav-link{
-    color:#2E2E32;
+.nav-item i {
+    width: 20px;
+    margin-right: 15px !important;
+    font-size: 16px;
+}
+
+.nav-item span {
     font-size: 14px;
+    font-weight: 500;
 }
 
-.nav-link.active{
-    border-bottom: 3px solid #7A5B5A;
+/* Contenido principal */
+.main-content {
+    margin-left: 250px;
+    min-height: 100vh;
+    background-color: #f5f5f5;
 }
 
-.nav-link:hover{
-    color: 	#5C565D;
-}
-
-/* Inicio */
-#Inicio #titulo{
-    color: #2E2E32;
-}
-
-#Inicio #subtitulo{
-    color: #2E2E32;
-}
-
-/* Guia de uso */
-#Guia .card {
-    background-color: 	#A58C6F; 
-    text-align: center;
-    color: rgb(0, 0, 0);
-    font-family: Arial, sans-serif;
-    height: 16rem;
-}
-
-.icon img{
-    width: 60px;
-    margin: 10px;
-}
-
-#Guia .card h3 {
-    font-size: 18px;
-    margin: 10px 0;
-}
-
-#Guia .card p {
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-#Guia .card:hover {
-    transform: scale(1.05);
-    transition: transform 0.3s;
-}
-
-/* Mapa */
-#map {
-    height: 10cm;
-    width: 10cm;
-    width: 50%;
-    float: right;
-    margin: 20px 0;
-    border: 2px solid #ccc;
-  }
-
-/* Footer */
-footer{
-    /* background-color: #A58C6F; */
-    font-family: Arial, sans-serif;
-}
-
-.creditos{
+/* Header */
+header {
+    background: white;
+    padding: 20px 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     display: flex;
-    justify-content: center;
-    color: #2E2E32;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* Boton para cerrar sesión */
+.logout-btn {
+    background-color: #7a5b5a;
+    color: white;
+    font-weight: bold !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logout-btn:hover {
+    background-color: #6a4b4a;
+    transform: translateY(-1px);
 }
