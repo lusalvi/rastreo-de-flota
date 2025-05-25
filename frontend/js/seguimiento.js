@@ -87,14 +87,14 @@ async function obtenerConductor(dni) {
     try {
         document.getElementById('estado').textContent = 'Obteniendo información del conductor...';
 
-        const res = await fetchAPI(`${API_URL}/conductores/${dni}`);
+        const res = await fetch(`${API_URL}/conductores/${dni}`);
         if (!res.ok) {
             throw new Error('Conductor no encontrado');
         }
         const conductor = await res.json();
 
         // Marcar al conductor como activo y compartiendo ubicación
-        await fetchAPI(`${API_URL}/conductores/${dni}`, {
+        await fetch(`${API_URL}/conductores/${dni}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -128,7 +128,7 @@ async function obtenerPasajeros(patente) {
     try {
         document.getElementById('estado').textContent = 'Buscando pasajeros asignados...';
 
-        const res = await fetchAPI(`${API_URL}/pasajeros`);
+        const res = await fetch(`${API_URL}/pasajeros`);
         if (!res.ok) {
             throw new Error('Error al obtener pasajeros');
         }
@@ -373,7 +373,7 @@ function actualizarUbicacion(posicion) {
     const dni = new URLSearchParams(window.location.search).get('dni');
     const timestamp = new Date().toISOString();
 
-    fetchAPI(`${API_URL}/ubicacion`, {
+    fetch(`${API_URL}/ubicacion`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -402,7 +402,7 @@ async function enviarUbicacion(latitud, longitud) {
         const timestamp = new Date().toISOString();
 
         // Enviar ubicación como nuevo registro
-        await fetchAPI(`${API_URL}/ubicacion`, {
+        await fetch(`${API_URL}/ubicacion`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -431,7 +431,7 @@ function detenerSeguimiento() {
     }
 
     // Marcar conductor como no compartiendo ubicación
-    fetchAPI(`${API_URL}/conductores/${dni}`, {
+    fetch(`${API_URL}/conductores/${dni}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
