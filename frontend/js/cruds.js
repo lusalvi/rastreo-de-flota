@@ -45,6 +45,29 @@ function alertaFechas() {
     });
 }
 
+function filtrar() {
+  const input = document.getElementById("searchInput");
+  const filter = input.value.toLowerCase();
+  const table = document.querySelector("table");
+  const rows = table.getElementsByTagName("tr");
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const cells = row.getElementsByTagName("td");
+    let show = false;
+
+    for (let j = 0; j < cells.length; j++) {
+      if (cells[j] && cells[j].innerText.toLowerCase().includes(filter)) {
+        show = true;
+        break;
+      }
+    }
+
+    row.style.display = show ? "" : "none";
+  }
+}
+
+
 // -------------------- CRUD CONDUCTORES --------------------
 async function cargarConductores() {
     try {
