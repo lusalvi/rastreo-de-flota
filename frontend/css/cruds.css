@@ -71,7 +71,7 @@ a{
 #conductorTable th,
 #pasajeroTable th,
 #vehiculoTable th {
-  background-color: #7A5B5A;
+  background-color: #5C565D;
   color: white;
   padding: 12px 14px;
   text-align: left;
@@ -90,7 +90,7 @@ a{
 #conductorTable tr:hover td,
 #pasajeroTable tr:hover td,
 #vehiculoTable tr:hover td {
-  background-color: #f0e7e7;  
+  background-color: #E4DED9;  
 }
 
 #conductorTable td:last-child {
