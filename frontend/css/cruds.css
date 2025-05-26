@@ -31,7 +31,6 @@ a{
 }
 
 .btn-primary,button {
-    background-color: #7A5B5A !important;
     color: white !important;
     margin: 5px;
 }
@@ -43,9 +42,25 @@ a{
 }
 
 .btn:hover, button:hover{
-    background-color: #A89F91;
+    background-color: #5C565D;
     transition: 0.2s;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
+#btnNuevoConductor, #btnNuevoPasajero, #btnNuevoVehiculo {
+    background-color: #2E2E32;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.btn-warning {
+    background-color: #7A5B5A;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #A89F91;
+    color: white;
 }
 
 .actions {
