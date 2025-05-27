@@ -85,3 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log("Inicialización global completa");
 });
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    verificarAcceso();
+  }
+});
