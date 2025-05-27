@@ -31,7 +31,7 @@ function verificarAcceso() {
 function cerrarSesion() {
   sessionStorage.clear();
   localStorage.clear();
-  window.location.href = `${BASE_PATH}/templates/logueo.html`;
+  window.location.href = `${BASE_PATH}/logueo.html`;
 }
 
 // -------------------- FETCH GENERAL --------------------
