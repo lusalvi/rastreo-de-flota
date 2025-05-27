@@ -24,14 +24,21 @@ function verificarAcceso() {
   if (!token || !verificado) {
     sessionStorage.clear();
     localStorage.clear();
-    window.location.replace(`templates/logueo.html`);
+    const esLocal = window.location.origin.includes('127.0.0.1') || window.location.origin.includes('localhost');
+    const rutaLogout = esLocal ? '/frontend/templates/logueo.html' : '/templates/logueo.html';
+
+    window.location.replace(rutaLogout);
   }
 }
 
 function cerrarSesion() {
   sessionStorage.clear();
   localStorage.clear();
-  window.location.href = `templates/logueo.html`;
+
+  const esLocal = window.location.origin.includes('127.0.0.1') || window.location.origin.includes('localhost');
+  const rutaLogout = esLocal ? '/frontend/templates/logueo.html' : '/templates/logueo.html';
+
+  window.location.href = rutaLogout;
 }
 
 // -------------------- FETCH GENERAL --------------------
