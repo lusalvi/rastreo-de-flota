@@ -109,7 +109,11 @@ function setupVerificacionModal() {
                 document.querySelector('.modal-backdrop')?.remove();
             }
 
-            window.location.href = `/index.html`;
+            const rutaFinal = window.location.origin.includes('127.0.0.1') || window.location.origin.includes('localhost')
+                ? '/frontend/index.html'
+                : '/index.html';
+
+            window.location.href = rutaFinal;
         } else {
             alert("Código incorrecto");
 
