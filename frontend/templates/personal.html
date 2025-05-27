@@ -70,8 +70,11 @@
     <div class="container">
       <div class="card">
         <div class="actions">
-          <input type="text" id="searchInput" placeholder="Buscar conductor..." onkeyup="filtrar()" style="margin-bottom: 10px; padding: 8px; width: 100%;">
-          <button type="button" class="btn btn-primary" id="btnNuevoConductor" data-bs-toggle="modal" data-bs-target="#modalConductor">
+          <input id="searchConductor" onkeyup="filtrarTabla('tablaConductores', 'searchConductor', 'contadorConductor')"
+            placeholder="Buscar conductor...">
+          <span id="contadorConductor" class="result-counter"></span>
+          <button type="button" class="btn btn-primary" id="btnNuevoConductor" data-bs-toggle="modal"
+            data-bs-target="#modalConductor">
             Agregar Conductor
           </button>
         </div>
@@ -96,8 +99,11 @@
 
       <div class="card mt-5">
         <div class="actions">
-          <input type="text" id="searchInput" placeholder="Buscar pasajero..." onkeyup="filtrar()" style="margin-bottom: 10px; padding: 8px; width: 100%;">
-          <button type="button" class="btn btn-primary" id="btnNuevoPasajero" data-bs-toggle="modal" data-bs-target="#modalPasajero">
+          <input id="searchPasajero" onkeyup="filtrarTabla('tablaPasajeros', 'searchPasajero', 'contadorPasajero')"
+            placeholder="Buscar pasajero...">
+          <span id="contadorPasajero" class="result-counter"></span>
+          <button type="button" class="btn btn-primary" id="btnNuevoPasajero" data-bs-toggle="modal"
+            data-bs-target="#modalPasajero">
             Agregar Pasajero
           </button>
         </div>

@@ -10,6 +10,8 @@ let directionsService;
 let directionsRenderer;
 let routeMarkersMap = new Map(); // Para almacenar marcadores de rutas por conductor
 let currentRouteShowing = null; // DNI del conductor cuya ruta se está mostrando
+let infoWindowAbierto = null;
+
 
 // Función para inicializar Google Maps
 function initMap() {
@@ -311,7 +313,9 @@ async function mostrarRutaConductor(conductor) {
             });
 
             marker.addListener('click', () => {
+                if (infoWindowAbierto) infoWindowAbierto.close();
                 infoWindow.open(map, marker);
+                infoWindowAbierto = infoWindow;
             });
 
             routeMarkers.push(marker);
@@ -460,12 +464,8 @@ function actualizarMarcadorConductor(conductor) {
             map: map,
             title: `${conductor.nombreCompleto} - ${vehiculo}`,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: "#4285F4",
-                fillOpacity: 0.9,
-                strokeWeight: 3,
-                strokeColor: "#FFFFFF"
+    url: 'https://maps.google.com/mapfiles/kml/shapes/cabs.png', // Ícono de auto
+    scaledSize: new google.maps.Size(32, 32) // Tamaño del ícono
             }
         });
 

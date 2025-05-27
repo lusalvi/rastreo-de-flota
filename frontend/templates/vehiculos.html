@@ -64,8 +64,11 @@
     <div class="container">
       <div class="card">
         <div class="actions mb-3">
-          <input type="text" id="searchInput" placeholder="Buscar vehículo..." onkeyup="filtrar()" style="margin-bottom: 10px; padding: 8px; width: 100%;">
-          <button type="button" class="btn btn-primary" id="btnNuevoVehiculo" data-bs-toggle="modal" data-bs-target="#modalVehiculo">
+          <input id="searchVehiculo" onkeyup="filtrarTabla('tablaVehiculos', 'searchVehiculo', 'contadorVehiculo')"
+            placeholder="Buscar vehículo...">
+          <span id="contadorVehiculo" class="result-counter"></span>
+          <button type="button" class="btn btn-primary" id="btnNuevoVehiculo" data-bs-toggle="modal"
+            data-bs-target="#modalVehiculo">
             Agregar Vehículo
           </button>
         </div>

@@ -58,14 +58,27 @@ a{
     color: white;
 }
 
+.btn-warning:hover {
+    background-color: #6B4C4B !important; /* Versión más oscura del mismo color */
+    transition: 0.2s;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
 .btn-danger {
     background-color: #A89F91;
     color: white;
 }
 
+.btn-danger:hover {
+    background-color: #968B7E !important; /* Versión más oscura del mismo color */
+    transition: 0.2s;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
 .actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
 }
 
@@ -129,24 +142,72 @@ a{
     gap: 10px;
 }
 
-#searchInput {
-  flex: 1;  
-  width: 100%;
-  padding: 10px 14px;
-  margin-bottom: 20px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
+/* Contenedor de búsqueda */
+.search-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px; /* Limita el ancho */
 }
 
-#searchInput:focus {
-  border-color: #8c6b65;
-  box-shadow: 0 0 5px rgba(140, 107, 101, 0.4);
+/* Inputs de búsqueda actualizados */
+#searchConductor, #searchPasajero, #searchVehiculo {
+    width: 30%;
+    padding: 12px 50px 12px 16px; /* Espacio para el contador */
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
 }
 
+#searchConductor:focus,
+#searchPasajero:focus,
+#searchVehiculo:focus {
+    border-color: #8c6b65;
+    box-shadow: 0 0 5px rgba(140, 107, 101, 0.4);
+}
+
+/* Contadores de resultados */
+.result-counter {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #8c6b65;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.result-counter.visible {
+    opacity: 1;
+}
+
+.result-counter.no-results {
+    background: #dc3545;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container {
+        max-width: none;
+        margin-bottom: 10px;
+    }
+}
 
 /*
 #conductoTable, #pasajeroTable, #vehiculoTable {
