@@ -74,7 +74,14 @@ async function fetchAPI(endpoint, method = 'GET', data = null) {
 
 // -------------------- UTILIDADES  --------------------
 function formatearFecha(fecha) {
-  return fecha ? new Date(fecha).toLocaleDateString('es-AR') : 'No especificada';
+  if (!fecha) return 'No especificada';
+  
+  const date = new Date(fecha);
+  // Ajuste manual: compensar la diferencia horaria para evitar el desfase de día
+  const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
+  
+  return adjustedDate.toLocaleDateString('es-AR');
 }
 
 // -------------------- INIT --------------------
