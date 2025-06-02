@@ -31,10 +31,36 @@ async function cargarKPIs() {
 }
 
 
-function calcularDiasRestantes(fecha) {
+function calcularDiasRestantes(fecha, tipo) {
   try {
     const hoy = new Date();
-    const fechaVencimiento = new Date(fecha);
+    let fechaVencimiento;
+
+    if (tipo === 'RTO') {
+      let fechaRealizacion;
+
+      if (fecha.includes('/')) {
+        // Formato: DD/MM/YYYY
+        const partes = fecha.split('/');
+        if (partes.length !== 3) return null;
+        fechaRealizacion = new Date(partes[2], partes[1] - 1, partes[0]);
+      } else if (fecha.includes('-')) {
+        // Formato: YYYY-MM-DD
+        const partes = fecha.split('-');
+        if (partes.length !== 3) return null;
+        fechaRealizacion = new Date(partes[0], partes[1] - 1, partes[2]);
+      } else {
+        return null; // Formato no reconocido
+      }
+
+      // Sumar 2 años a la fecha de realización para obtener el vencimiento
+      fechaVencimiento = new Date(fechaRealizacion);
+      fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 2);
+    } else {
+      // Para licencias
+      fechaVencimiento = new Date(fecha);
+    }
+
     const diferencia = fechaVencimiento - hoy;
     return Math.floor(diferencia / (1000 * 60 * 60 * 24)); // días restantes
   } catch (error) {
@@ -42,6 +68,7 @@ function calcularDiasRestantes(fecha) {
     return null;
   }
 }
+
 
 async function cargarVencimientos() {
   try {
@@ -58,7 +85,7 @@ async function cargarVencimientos() {
     // Verificar vencimientos de RTO de vehículos
     vehiculos.forEach(vehiculo => {
       if (vehiculo.rto) {
-        const diasRestantes = calcularDiasRestantes(vehiculo.rto);
+        const diasRestantes = calcularDiasRestantes(vehiculo.rto, 'RTO');
 
         if (diasRestantes !== null) {
           let status = '';
@@ -67,11 +94,14 @@ async function cargarVencimientos() {
           if (diasRestantes < 0) {
             status = 'status-expired';
             mensaje += ` - Vencida hace ${Math.abs(diasRestantes)} días`;
-          } else if (diasRestantes <= 30) {
+          } else if (diasRestantes <= 50) {
             status = 'status-warning';
             mensaje += ` - Vence en ${diasRestantes} días`;
+          } else if (diasRestantes <= 200) {
+            status = 'status-ok';
+            mensaje += ` - Vence en ${diasRestantes} días`;
           } else {
-            return; // No mostrar si faltan más de 30 días
+            return; // no mostrar si faltan más de 200 días
           }
 
           alertasHTML += `
@@ -99,23 +129,22 @@ async function cargarVencimientos() {
           } else if (diasRestantes <= 30) {
             status = 'status-warning';
             mensaje += ` - Vence en ${diasRestantes} días`;
-          } else if(diasRestantes <=200){
+          } else if (diasRestantes <= 200) {
             status = 'status-ok';
-            mensaje +=  ` - Vence en ${diasRestantes} días`;
+            mensaje += ` - Vence en ${diasRestantes} días`;
           } else {
-            return; // Ignorar si falta más de 90 días
+            return; // Ignorar si falta más de 200 días
           }
 
           alertasHTML += `
-        <div class="alert-item">
-          <div class="alert-status ${status}"></div>
-          <div class="alert-info">${mensaje}</div>
-        </div>
-      `;
+            <div class="alert-item">
+              <div class="alert-status ${status}"></div>
+              <div class="alert-info">${mensaje}</div>
+            </div>
+          `;
         }
       }
     });
-
 
     if (alertasHTML === '') {
       alertasHTML = '<div class="alert-info">No hay vencimientos próximos</div>';
@@ -123,7 +152,6 @@ async function cargarVencimientos() {
 
     vencimientosContainer.innerHTML = alertasHTML;
     console.log("Vencimientos cargados correctamente");
-
   } catch (error) {
     console.error("Error al cargar vencimientos:", error);
     document.getElementById('vencimientosContainer').innerHTML =
