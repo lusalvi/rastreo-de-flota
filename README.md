@@ -22,7 +22,7 @@ Sistema web diseñado para gestionar eficientemente los vehículos de una empres
 ### Backend
 - **Node.js** - Entorno de ejecución
 - **Express.js** - Framework web
-- **PostgreSQL** - Base de datos relacional
+- **PostgreSQL** - Base de datos relacional(vía Supabase)
 
 ### Servicios Externos
 - **Google Maps API** - Visualización de mapas y rutas
@@ -129,22 +129,12 @@ CREATE TABLE usuarios (
 
 ### 4. Configurar el Frontend
 
-```bash
-cd ../frontend
-# No requiere instalación de dependencias adicionales ya que usa CDN
-```
+No requiere instalación adicional. El proyecto utiliza CDNs para Bootstrap, Google Maps y EmailJS.
 
-Crear un archivo config.js en la carpeta frontend:
-```bash
-// Configuración de APIs
-const CONFIG = {
-  API_BASE_URL: 'http://localhost:3000/api',
-  GOOGLE_MAPS_API_KEY: 'tu_google_maps_api_key',
-  EMAILJS_PUBLIC_KEY: 'tu_emailjs_public_key',
-  EMAILJS_SERVICE_ID: 'tu_emailjs_service_id',
-  EMAILJS_TEMPLATE_ID: 'tu_emailjs_template_id'
-};
-```
+📍 Importante: Debes editar las claves directamente en los archivos donde se usan:
+
+- Google Maps API: en el <script> de carga del mapa.
+- EmailJS: en los métodos emailjs.send() de los formularios.
 
 ### 5. Configurar APIs Externas
 
