@@ -134,6 +134,18 @@ cd ../frontend
 # No requiere instalación de dependencias adicionales ya que usa CDN
 ```
 
+Crear un archivo config.js en la carpeta frontend:
+```bash
+// Configuración de APIs
+const CONFIG = {
+  API_BASE_URL: 'http://localhost:3000/api',
+  GOOGLE_MAPS_API_KEY: 'tu_google_maps_api_key',
+  EMAILJS_PUBLIC_KEY: 'tu_emailjs_public_key',
+  EMAILJS_SERVICE_ID: 'tu_emailjs_service_id',
+  EMAILJS_TEMPLATE_ID: 'tu_emailjs_template_id'
+};
+```
+
 ### 5. Configurar APIs Externas
 
 #### Google Maps API
